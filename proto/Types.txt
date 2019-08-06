@@ -1,0 +1,8 @@
+syntax = "proto3";
+enum MsgTypes
+{
+	TYPE_LOGIN = 0;
+	TYPE_USER = 1;
+	TYPE_MATCH = 2;
+	TYPE_FIGHT = 3;
+}

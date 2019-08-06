@@ -1,0 +1,10 @@
+syntax = "proto3";
+enum MatchTypes
+{
+		ENTER_CREQ = 0;//申请进入匹配
+		ENTER_SRES = 1;//返回申请结果
+		LEAVE_CREQ = 2;//申请离开匹配
+		LEAVE_SRES = 3;//返回离开结果
+
+		ENTER_SELECT_BRO = 4;//匹配完毕，通知进入 选择界面广播
+}
