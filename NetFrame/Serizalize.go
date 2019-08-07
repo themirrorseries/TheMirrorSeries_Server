@@ -1,20 +1,18 @@
 package NetFrame
 
-import "fmt"
-func Encodeaa(thetype int32, command int32){
-	switch(thetype){
-	case 0:
-		
-	}
-}
+import ("fmt"
+)
 
 func DeSerizalize(msg []byte){
 	var decode Decode
 	decode.Read(msg);
+	
 	fmt.Println(decode.len)
+	
+	//HANDLER CENTER
 	switch(decode.thetype){
 	case 0:
-		//login;
+
 		break;
 	
 	case 1:

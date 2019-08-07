@@ -15,7 +15,7 @@ func main() {
     }
 
     //测试encode与deSerialize
-    encode := NetFrame.NewEncode(8,1,1)
+    encode := NetFrame.NewEncode(8,0,0)
     encode.Write()
     //client.Write([]byte("i am client"))
     client.Write(encode.GetBytes())

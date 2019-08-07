@@ -17,7 +17,6 @@ func recvMessage(client net.Conn) error {
 			DeSerizalize(message[0:len])
 		}
 	}
-
 	return nil
 }
 
