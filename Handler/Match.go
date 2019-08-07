@@ -1,7 +1,6 @@
 package Handler
 
 import ("fmt"
-"../Global"
 )
 
 type Match struct{
@@ -41,30 +40,14 @@ func (match *Match)matchStart(){
 	fmt.Println("match start")
 	//add to match pool
 	isMatched :=false
-	switch(Global.RoomCache.playernum){
-		case 0:
-			//playid1
-			break
-		case 1:
-			//playid2
-			break 
-		case 2:
-			//playerid3
-			break;
-		case 3:
-			//playerid4
-			//new map(cache) insert(newmap) cache.clear
-			//inform
-			break;
-		default:
-			break;
-	}
+
 }
 
 func (match *Match)matchEnd(){
 	//to do
 	fmt.Println("match end")
 	//delete from cache room
+
 
 }
 
