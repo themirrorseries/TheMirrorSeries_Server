@@ -1,14 +1,14 @@
-package main
+package Handler
 
-type Match struct{
+type Fight struct{
 	command int32
 	messages []byte
 	bytesStart int32
 	bytesEnd int32
 }
 
-func NewMatch(c, start, end, int32, msg []byte) *Match{
-	login := &Login{
+func NewFight(c, start, end int32, msg []byte) *Match{
+	match := &Match{
 		command:	c,
 		bytesStart:	start,
 		bytesEnd:	end,
@@ -16,9 +16,9 @@ func NewMatch(c, start, end, int32, msg []byte) *Match{
 	}
 	return match
 }
-
+/*
 func (match *Match)reveiveMessage(){
-	switch (login.command){
+	switch (match.command){
 	case 0:
 		//申请进入匹配
 		match.matchStart()
@@ -41,4 +41,4 @@ func (match *Match)matchStart(){
 func (match *Match)matchEnd(){
 	//to do
 	fmt.Println("match end")
-}
+}*/

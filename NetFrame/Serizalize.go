@@ -1,7 +1,9 @@
 package NetFrame
 
-import ("fmt"
-)
+import("fmt"
+"../Handler"
+	)
+
 
 func DeSerizalize(msg []byte){
 	var decode Decode
@@ -11,8 +13,11 @@ func DeSerizalize(msg []byte){
 	
 	//HANDLER CENTER
 	switch(decode.thetype){
-	case 0:
-
+	case 0:{
+			login := Handler.NewLogin(decode.command, decode.readPos, decode.len, msg)
+			login.ReveiveMessage()
+			//return login
+	}
 		break;
 	
 	case 1:
@@ -20,6 +25,8 @@ func DeSerizalize(msg []byte){
 		break;
 	case 2:
 		//match
+		match:=Handler.NewMatch(decode.command, decode.readPos, decode.len, msg)
+		match.ReveiveMessage()
 		break;
 	case 3:
 		//fight

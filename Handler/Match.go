@@ -1,4 +1,4 @@
-package main
+package Handler
 
 import "fmt"
 
@@ -19,7 +19,7 @@ func NewMatch(c, start, end int32, msg []byte) *Match{
 	return match
 }
 
-func (match *Match)reveiveMessage(){
+func (match *Match)ReveiveMessage(){
 	switch (match.command){
 	case 0:
 		//申请进入匹配
@@ -37,10 +37,11 @@ func (match *Match)reveiveMessage(){
 func (match *Match)matchStart(){
 	//to do
 	fmt.Println("match start")
-	
+	//add to match pool	
 }
 
 func (match *Match)matchEnd(){
 	//to do
 	fmt.Println("match end")
+	//delete from match pool
 }

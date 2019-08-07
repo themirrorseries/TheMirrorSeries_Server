@@ -20,4 +20,5 @@ func (dec *Decode)Read(head []byte){
 	binary.Read(bytes.NewBuffer(head[dec.readPos:]), binary.BigEndian, &dec.thetype)
 	dec.readPos += 4
 	binary.Read(bytes.NewBuffer(head[dec.readPos:]), binary.BigEndian, &dec.command)
+	dec.readPos += 4
 }

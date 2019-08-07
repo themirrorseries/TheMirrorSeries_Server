@@ -1,10 +1,11 @@
-package main
+package Handler
 
+import "fmt"
 type Login struct{
 	command int32
+	messages []byte
 	bytesStart int32
 	bytesEnd int32
-	messages []byte
 }
 
 func NewLogin(c, start, end int32, msg []byte) *Login{
@@ -17,27 +18,27 @@ func NewLogin(c, start, end int32, msg []byte) *Login{
 	return login
 }
 
-func (login *Login)reveiveMessage(){
+func (login *Login)ReveiveMessage(){
 	switch (login.command){
 	case 0:
-		//login	客户端申请登录
+		login.clientLogin()
 		break;
 	case 2:
 		//客户端申请注册
+		login.clientRegist()
 		break;
 	default:
+		fmt.Println("其他错误")
 		break;
 	}
 }
-func (login *Login)login(command int32, messages []byte){
-	switch command{
-	case 0:
-		//login	客户端申请登录
-		break;
-	case 2:
-		//客户端申请注册
-		break;
-	default:
-		break;
-	}
+func (login *Login)clientLogin(){
+	//to do  loginDto
+	fmt.Println("client login")
+	
+}
+
+func (login *Login)clientRegist(){
+	//to do	loginDto
+	fmt.Println("client regist")
 }
