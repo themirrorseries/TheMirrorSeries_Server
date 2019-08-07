@@ -5,6 +5,7 @@ import (
     "net"
     "os"
     "../NetFrame"
+    //"../Handler"
 )
 
 func main() {
@@ -19,6 +20,6 @@ func main() {
     encode.Write()
     //client.Write([]byte("i am client"))
     client.Write(encode.GetBytes())
-
+    //clinet.
     client.Close()
 }

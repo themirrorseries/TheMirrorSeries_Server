@@ -30,6 +30,7 @@ func DeSerizalize(msg []byte){
 		break;
 	case 3:
 		//fight
+		//roomManager()
 		break;
 	default:
 		break

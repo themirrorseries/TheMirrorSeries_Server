@@ -1,6 +1,8 @@
 package Handler
 
-import "fmt"
+import ("fmt"
+"../Global"
+)
 
 type Match struct{
 	command int32
@@ -37,11 +39,33 @@ func (match *Match)ReveiveMessage(){
 func (match *Match)matchStart(){
 	//to do
 	fmt.Println("match start")
-	//add to match pool	
+	//add to match pool
+	isMatched :=false
+	switch(Global.RoomCache.playernum){
+		case 0:
+			//playid1
+			break
+		case 1:
+			//playid2
+			break 
+		case 2:
+			//playerid3
+			break;
+		case 3:
+			//playerid4
+			//new map(cache) insert(newmap) cache.clear
+			//inform
+			break;
+		default:
+			break;
+	}
 }
 
 func (match *Match)matchEnd(){
 	//to do
 	fmt.Println("match end")
-	//delete from match pool
+	//delete from cache room
+
 }
+
+//enter(user token)

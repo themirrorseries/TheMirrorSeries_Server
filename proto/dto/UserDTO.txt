@@ -1,6 +1,6 @@
 syntax = "proto3";
-enum AnyDTO
+message UserDTO
 {
-		int32 id
-		string machine
+		int32 id=1;
+		string uuid=2;
 }

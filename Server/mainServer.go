@@ -1,12 +1,12 @@
 package main
 
-import "../NetFrame"
-
-func readint32(bytes []byte) {
-	
-}
+import ("../NetFrame"
+	"../Global"
+)
 func main() {
-
+	//初始化
+	Global.RoomCache.Clear()
+	Global.NextRoomID = 1
 	NetFrame.Start()
 
 }
