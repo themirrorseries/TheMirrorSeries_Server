@@ -48,6 +48,7 @@ func (login *Login)clientLogin(){
 	any :=AnyDTO.AnyDTO{}
 	//any.XXX_Unmarshal(login.messages[login.bytesStart:login.bytesEnd])
 	proto.Unmarshal(login.messages[login.bytesStart:login.bytesEnd], &any)
+	fmt.Println("dto ok")
 	if(!IsExist()){
 		Global.NextUserIDMu.Lock()
 		login.SendLoginMessage(Global.NextRoomID)
@@ -75,11 +76,12 @@ func (login *Login)SendLoginMessage(id int32){
 	//any.XXX_Marshal()
 	data,_:= proto.Marshal(&any)
 	//any.XXX_Marshal()
-
+	fmt.Println("encode ok")
 	encode :=NetFrame.NewEncode(int32(8+any.XXX_Size()), 0, 1)
 	encode.Write()
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())
 	buffer.Write(data)
 	login.client.Write(buffer.Bytes())
+	fmt.Println("send ok")
 }

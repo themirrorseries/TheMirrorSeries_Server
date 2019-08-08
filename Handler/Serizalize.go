@@ -27,7 +27,7 @@ func DeSerizalize(msg []byte, client net.Conn){
 		break;
 	case 2:
 		//match
-		match:=NewMatch(decode.Command, decode.ReadPos, decode.Len, msg)
+		match:=NewMatch(decode.Command, decode.ReadPos, decode.Len, msg, client)
 		match.ReveiveMessage()
 		break;
 	case 3:

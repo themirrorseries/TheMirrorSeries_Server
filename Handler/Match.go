@@ -2,6 +2,9 @@ package Handler
 
 import ("fmt"
 "../Global"
+	"net"
+	"../proto/dto"
+	"github.com/golang/protobuf/proto"
 )
 
 type Match struct{
@@ -9,14 +12,16 @@ type Match struct{
 	messages []byte
 	bytesStart int32
 	bytesEnd int32
+	client net.Conn
 }
 
-func NewMatch(c, start, end int32, msg []byte) *Match{
+func NewMatch(c, start, end int32, msg []byte, _client net.Conn) *Match{
 	match := &Match{
 		command:	c,
 		bytesStart:	start,
 		bytesEnd:	end,
 		messages:	msg,
+		client:_client,
 	}
 	return match
 }
@@ -40,8 +45,10 @@ func (match *Match)matchStart(){
 	//to do
 	fmt.Println("match start")
 	//add to match pool
-	//isMatched :=false
-	Global.RoomCache.InsertPlayer(1)
+	//匹配也用anyDTO
+	any := AnyDTO.AnyDTO{}
+	proto.Unmarshal(match.messages[match.bytesStart:match.bytesEnd], &any)
+	Global.RoomCache.InsertPlayer(any.Code)
 
 }
 

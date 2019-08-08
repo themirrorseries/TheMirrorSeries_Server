@@ -6,6 +6,11 @@ import (
 	"net"
 	"os"
 	//"../Handler"
+	"fmt"
+	"../proto/dto"
+	"github.com/golang/protobuf/proto"
+	"time"
+	"bytes"
 )
 
 func main() {
@@ -16,10 +21,40 @@ func main() {
 	}
 
 	//测试encode与deSerialize
-	encode := NetFrame.NewEncode(8, 2, 0)
+	anysend :=AnyDTO.AnyDTO{}
+	anysend.Code = 1
+	data, _ :=proto.Marshal(&anysend)
+	encode := NetFrame.NewEncode(int32(12+anysend.XXX_Size()), 0, 0)
 	encode.Write()
+	var buffer bytes.Buffer
+	buffer.Write(encode.GetBytes())
+	buffer.Write(data)
+
+
 	//client.Write([]byte("i am client"))
-	client.Write(encode.GetBytes())
+	client.Write(buffer.Bytes())
 	//clinet.
+	var message []byte
+	client.Read(message)
+	var decode NetFrame.Decode
+	decode.Read(message)
+	any := AnyDTO.AnyDTO{}
+	proto.Unmarshal(message[decode.ReadPos:decode.Len], &any)
+	fmt.Println(decode.Len , " " , decode.Thetype , " " ,decode.Command , "",any.Code )
+
+	timeTicker := time.NewTicker(time.Second * 10)
+	i := 0
+	for {
+		if i > 5 {
+			break
+		}
+
+		fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+		i++
+		<-timeTicker.C
+
+	}
+	// 清理计时器
+	timeTicker.Stop()
 	client.Close()
 }
