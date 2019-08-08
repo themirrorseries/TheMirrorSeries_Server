@@ -1,12 +1,12 @@
 package main
 
-import ("../NetFrame"
-	"../Global"
+import (	"../Global"
+"../Handler"
 )
 func main() {
 	//初始化
 	Global.RoomCache.Clear()
 	Global.NextRoomID = 1
-	NetFrame.Start()
-
+	Global.NextUserID = 100000
+	Handler.Start()
 }
