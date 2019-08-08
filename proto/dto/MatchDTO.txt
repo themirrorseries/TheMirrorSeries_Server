@@ -6,9 +6,3 @@ message MatchDTO
 		int32 roleID=3;
 		
 }
-message CancelMatchDTO
-{
-  int32 id=1;
-  int32 roomID=2;
-  
-}

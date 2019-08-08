@@ -21,10 +21,10 @@ func main() {
 	}
 
 	//测试encode与deSerialize
-	anysend :=DTO.AnyDTO{}
-	anysend.Code = 1
+	anysend :=DTO.MatchDTO{}
+	anysend.Id = 1
 	data, _ :=proto.Marshal(&anysend)
-	encode := NetFrame.NewEncode(int32(12+anysend.XXX_Size()), 0, 0)
+	encode := NetFrame.NewEncode(int32(8+anysend.XXX_Size()), 2, 0)
 	encode.Write()
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())
@@ -38,9 +38,9 @@ func main() {
 	client.Read(message)
 	var decode NetFrame.Decode
 	decode.Read(message)
-	any := DTO.AnyDTO{}
+	any := DTO.MatchSuccessDTO{}
 	proto.Unmarshal(message[decode.ReadPos:decode.Len], &any)
-	fmt.Println(decode.Len , " " , decode.Thetype , " " ,decode.Command , "",any.Code )
+	fmt.Println(decode.Len , " " , decode.Thetype , " " ,decode.Command , "",any.Roomid )
 
 	timeTicker := time.NewTicker(time.Second * 10)
 	i := 0

@@ -49,7 +49,6 @@ func (match *Match)matchStart(){
 	any := DTO.MatchDTO{}
 	proto.Unmarshal(match.messages[match.bytesStart:match.bytesEnd], &any)
 	Global.RoomCache.InsertPlayer(any.Id, match.client)
-	fmt.Println("match success")
 }
 
 func (match *Match)matchEnd(){
