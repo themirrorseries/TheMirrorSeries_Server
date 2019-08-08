@@ -10,3 +10,6 @@ protoc ./proto/UserTypes.txt --csharp_out=./protofiles/
 
 protoc ./proto/dto/AnyDTO.txt --go_out=./protofiles/
 protoc ./proto/dto/AnyDTO.txt --csharp_out=./protofiles/
+
+protoc ./proto/dto/UserDTO.txt --go_out=./protofiles/
+protoc ./proto/dto/UserDTO.txt --csharp_out=./protofiles/
