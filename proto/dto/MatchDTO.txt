@@ -1,8 +1,8 @@
 syntax = "proto3";
-enum MatchDTO
+message MatchDTO
 {
-		int32 id
-		string name
-		int32 roleID
+		int32 id=1;
+		string name=2;
+		int32 roleID=3;
 		
 }

@@ -2,6 +2,7 @@ package NetFrame
 
 import("fmt"
 "../Handler"
+"../Global"
 	)
 
 
@@ -31,6 +32,7 @@ func DeSerizalize(msg []byte){
 	case 3:
 		//fight
 		//roomManager()
+		Global.ChanMap[decode.command] <- msg
 		break;
 	default:
 		break

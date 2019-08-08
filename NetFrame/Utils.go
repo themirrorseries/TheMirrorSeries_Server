@@ -1,9 +1,8 @@
 package NetFrame
 
-import("os"
-	"net"
+import(	"net"
 	)
 
-func WritetoUsers(s net.conn, encode Encode, msg []byte){
+func WritetoUsers(s net.Conn, encode Encode, msg []byte){
 	
 }

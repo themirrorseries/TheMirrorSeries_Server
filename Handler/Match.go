@@ -1,6 +1,7 @@
 package Handler
 
 import ("fmt"
+"../Global"
 )
 
 type Match struct{
@@ -39,7 +40,8 @@ func (match *Match)matchStart(){
 	//to do
 	fmt.Println("match start")
 	//add to match pool
-	isMatched :=false
+	//isMatched :=false
+	Global.RoomCache.InsertPlayer(1)
 
 }
 
