@@ -21,7 +21,7 @@ func main() {
 	}
 
 	//测试encode与deSerialize
-	anysend :=AnyDTO.AnyDTO{}
+	anysend :=DTO.AnyDTO{}
 	anysend.Code = 1
 	data, _ :=proto.Marshal(&anysend)
 	encode := NetFrame.NewEncode(int32(12+anysend.XXX_Size()), 0, 0)
@@ -38,7 +38,7 @@ func main() {
 	client.Read(message)
 	var decode NetFrame.Decode
 	decode.Read(message)
-	any := AnyDTO.AnyDTO{}
+	any := DTO.AnyDTO{}
 	proto.Unmarshal(message[decode.ReadPos:decode.Len], &any)
 	fmt.Println(decode.Len , " " , decode.Thetype , " " ,decode.Command , "",any.Code )
 

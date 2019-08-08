@@ -1,40 +1,47 @@
 package Global
 
-import "time"
+import (
+	"time"
+	"net"
+)
 
 //import "../Global"
 // map<roomid, room>
-type Room struct {
-	roomid    int32 //唯一id
-	isfull    bool  //是否满员
-	playernum int32 //人数
-	player1id int32 //人员唯一id
-	player2id int32
-	player3id int32
-	player4id int32
+type PlayerList struct{
+	PlayerID int32
+	PlayerClient net.Conn
 }
 
+type Room struct {
+	roomid    	int32 //唯一id
+	isfull    	bool  //是否满员
+	playernum 	int32 //人数
+	players		[]PlayerList
+}
+
+func NewRoom()*Room{
+	room :=&Room{
+		roomid:		0,
+		isfull:false,
+		playernum:0,
+		players:make([]PlayerList, 4),
+	}
+	return room
+}
 func (room *Room) Clear() {
 	room.roomid = 0
 	room.isfull = false
 	room.playernum = 0
-	room.player1id = 0
-	room.player2id = 0
-	room.player3id = 0
-	room.player4id = 0
+	for _,player:=range room.players{
+		player.PlayerID=0
+	}
 }
 
-func CopyRoom(cacheRoom *Room) *Room {
-	room := &Room{
-		roomid:    cacheRoom.roomid,
-		isfull:    cacheRoom.isfull,
-		playernum: cacheRoom.playernum,
-		player1id: cacheRoom.player1id,
-		player2id: cacheRoom.player2id,
-		player3id: cacheRoom.player3id,
-		player4id: cacheRoom.player4id,
-	}
-	return room
+func (room *Room)CopyRoom(cacheRoom *Room) {
+	room.roomid = cacheRoom.roomid
+	room.isfull = cacheRoom.isfull
+	room.playernum = cacheRoom.playernum
+
 }
 
 //游戏初始化  单独通知玩家所属座位编号	光线信息
@@ -47,7 +54,7 @@ func RoomRun(room Room) {
 	RoomInform(&room)
 
 	//创建定时器
-	ticker := time.NewTicker(20 * time.Microsecond)
+	ticker := time.NewTicker(5 * time.Microsecond)
 
 	for{
 		if(false){
@@ -60,33 +67,30 @@ func RoomRun(room Room) {
 }
 
 //cache room调用
-func (room *Room) InsertPlayer(playerid int32) {
-	insertSuccess := true
+func (room *Room) InsertPlayer(playerid int32, client net.Conn) {
+	insertSuccess := false
 	//roomFull
 	RoomCacheMu.Lock()
 	if !room.isfull {
-		if room.player1id == 0 {
-			room.player1id = playerid
-		} else if room.player1id == 0 {
-			room.player2id = playerid
-		} else if room.player1id == 0 {
-			room.player2id = playerid
-		} else if room.player1id == 0 {
-			room.player2id = playerid
-		} else {
-			insertSuccess = false
+		for _,player := range room.players{
+			if(player.PlayerID==0){
+				player.PlayerID = playerid
+				player.PlayerClient = client
+				insertSuccess = true
+				break
+			}
 		}
 	}
 	if insertSuccess {
 		room.playernum++
 	}
 	if room.playernum == 4 {
-
-		RoomMng[NextRoomID] = RoomCache
+		RoomCache.roomid = NextRoomID
+		RoomMng[NextRoomID] = NewRoom()
 		ChanMap[NextRoomID] = make(chan []byte)
 		NextRoomID++
 		RoomCache.Clear()
-		go RoomRun(RoomMng[NextRoomID-1])
+		go RoomRun(*RoomMng[NextRoomID-1])
 	}
 	RoomCacheMu.Unlock()
 }

@@ -45,17 +45,17 @@ func (login *Login)clientLogin(){
 	//to do  loginDto
 	fmt.Println("client login")
 	//解码dto
-	any :=AnyDTO.AnyDTO{}
+	any :=DTO.UserDTO{}
 	//any.XXX_Unmarshal(login.messages[login.bytesStart:login.bytesEnd])
 	proto.Unmarshal(login.messages[login.bytesStart:login.bytesEnd], &any)
 	fmt.Println("dto ok")
 	if(!IsExist()){
 		Global.NextUserIDMu.Lock()
-		login.SendLoginMessage(Global.NextRoomID)
-		Global.NextRoomID++
+		login.SendLoginMessage(Global.NextUserID)
+		Global.NextUserID++
 		Global.NextUserIDMu.Unlock()
 	}else{
-		login.SendLoginMessage(Global.NextRoomID)
+		login.SendLoginMessage(Global.NextUserID)
 	}
 
 }
@@ -71,8 +71,8 @@ func IsExist() bool{
 }
 
 func (login *Login)SendLoginMessage(id int32){
-	any :=AnyDTO.AnyDTO{}
-	any.Code=id
+	any :=DTO.UserDTO{}
+	any.Id=id
 	//any.XXX_Marshal()
 	data,_:= proto.Marshal(&any)
 	//any.XXX_Marshal()
