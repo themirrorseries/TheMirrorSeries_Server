@@ -48,6 +48,7 @@ func (login *Login)clientLogin(){
 	any :=DTO.UserDTO{}
 	//any.XXX_Unmarshal(login.messages[login.bytesStart:login.bytesEnd])
 	proto.Unmarshal(login.messages[login.bytesStart:login.bytesEnd], &any)
+	fmt.Println(any.Id)
 	fmt.Println("dto ok")
 	if(!IsExist()){
 		Global.NextUserIDMu.Lock()

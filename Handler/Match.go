@@ -46,10 +46,10 @@ func (match *Match)matchStart(){
 	fmt.Println("match start")
 	//add to match pool
 	//匹配也用anyDTO
-	any := DTO.AnyDTO{}
+	any := DTO.MatchDTO{}
 	proto.Unmarshal(match.messages[match.bytesStart:match.bytesEnd], &any)
-	Global.RoomCache.InsertPlayer(any.Code, match.client)
-
+	Global.RoomCache.InsertPlayer(any.Id, match.client)
+	fmt.Println("match success")
 }
 
 func (match *Match)matchEnd(){

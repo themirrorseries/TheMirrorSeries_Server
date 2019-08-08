@@ -16,7 +16,7 @@ func DeSerizalize(msg []byte, client net.Conn){
 	//HANDLER CENTER
 	switch(decode.Thetype){
 	case 0:{
-			login := NewLogin(decode.Command, decode.ReadPos, decode.Len, msg, client)
+			login := NewLogin(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
 			login.ReveiveMessage()
 			//return login
 	}
@@ -27,7 +27,7 @@ func DeSerizalize(msg []byte, client net.Conn){
 		break;
 	case 2:
 		//match
-		match:=NewMatch(decode.Command, decode.ReadPos, decode.Len, msg, client)
+		match:=NewMatch(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
 		match.ReveiveMessage()
 		break;
 	case 3:

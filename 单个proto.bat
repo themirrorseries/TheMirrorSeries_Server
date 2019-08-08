@@ -1,2 +1,2 @@
-protoc ./proto/dto/UserDTO.txt --go_out=./
-protoc ./proto/dto/UserDTO.txt --csharp_out=./protofiles/
+protoc ./proto/dto/MatchSuccessDTO.txt --go_out=./
+protoc ./proto/dto/MatchSuccessDTO.txt --csharp_out=./
