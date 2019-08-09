@@ -5,6 +5,7 @@ import (	"../Global"
 )
 func main() {
 	//初始化
+	Global.RoomMng = make(map[int32]*Global.Room, 10)
 	Global.RoomCache = *Global.NewRoom()
 	Global.RoomCache.Clear()
 	Global.NextRoomID = 1

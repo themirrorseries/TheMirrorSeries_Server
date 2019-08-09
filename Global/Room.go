@@ -100,14 +100,10 @@ func (room *Room) InsertPlayer(playerid int32, client net.Conn) {
 	if room.playernum == 2 {
 		fmt.Println("match two people")
 		RoomCache.roomid = NextRoomID
-		room :=new(Room)
-		room.players = make([]PlayerList, 2)
-		fmt.Println("new ok")
-		room.CopyRoom(&RoomCache)
-		fmt.Println("copy ok")
-		RoomMng[NextRoomID] = room
+		RoomMng[NextRoomID] = NewRoom()
+		RoomMng[NextRoomID].CopyRoom(&RoomCache)
 		fmt.Println("map ok")
-		ChanMap[NextRoomID] = make(chan []byte)
+		//ChanMap[NextRoomID] = make(chan []byte)
 		NextRoomID++
 		RoomCache.Clear()
 //		RoomInform(RoomMng[NextRoomID-1])
@@ -131,18 +127,30 @@ func (room *Room)RoomInform(){
 	fmt.Println("inform")
 	match :=DTO.MatchSuccessDTO{}
 	match.Roomid = room.roomid
+	fmt.Println(len(room.players))
+	//match.Players = make([]*DTO.Player,2)
+	players1 := new(DTO.Player)
+	players2 := new(DTO.Player)
+	match.Players = make([]*DTO.Player,2)
+	match.Players[0] = players1
+	match.Players[1] = players2
+	fmt.Println("panic make")
 	for i:=0;i<len(room.players);i++{
 		match.Players[i].Playerid=room.players[i].PlayerID
+		fmt.Println("panic [i]")
 		match.Players[i].Name=room.players[i].Name
 		match.Players[i].Roleid=room.players[i].PlayerRole
 		match.Players[i].Seat=int32(i+1)
 	}
+	fmt.Println("match ok")
 	data, _:=proto.Marshal(&match)
 	encode :=NetFrame.NewEncode(int32(8+match.XXX_Size()), 2,4)
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())
 	buffer.Write(data)
+	fmt.Println("buffer ok")
 	for i:=0;i<len(room.players);i++ {
 		room.players[i].PlayerClient.Write(buffer.Bytes())
 	}
+	fmt.Println("room inform ok")
 }
