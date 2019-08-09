@@ -30,7 +30,7 @@ func NewRoom()*Room{
 		roomid: 0,
 		isfull: false,
 		playernum:0,
-		players:make([]PlayerList, 2),
+		players:make([]PlayerList, RoomPeople),
 	}
 	return room
 }
@@ -56,10 +56,10 @@ func (room *Room)CopyRoom(cacheRoom *Room) {
 //其余群发通知	每隔t时间收集玩家操作 广播给所有房间内玩家
 //通知消息需要的数据	4个位置playerid	4个socket
 
-//多线程执行房间
+//多线程执行房间 not use now
 func (room *Room)RoomRun() {
 	//通知当前房间玩家匹配成功
-	room.RoomInform()
+	//room.RoomInform()
 	//创建定时器
 	/*ticker := time.NewTicker(5 * time.Microsecond)
 
@@ -77,22 +77,18 @@ func (room *Room)RoomRun() {
 func (room *Room) InsertPlayer(playerid int32, client net.Conn) {
 	//roomFull
 	RoomCacheMu.Lock()
-	insertSuccess := false
 	if !room.isfull {
 		for i:=0;i<len(room.players);i++{
 			if(room.players[i].PlayerID==-1){
 				room.players[i].PlayerID = playerid
 				room.players[i].PlayerClient = client
-				insertSuccess = true
 				break
 			}
 		}
 	}
-	fmt.Println(insertSuccess)
-	if insertSuccess {
-		room.playernum++
-	}
-	if room.playernum == 2 {
+	room.playernum++
+
+	if room.playernum == RoomPeople {
 		RoomCache.roomid = NextRoomID
 		RoomMng[NextRoomID] = NewRoom()
 		RoomMng[NextRoomID].CopyRoom(&RoomCache)
@@ -110,20 +106,19 @@ func (room *Room) findPlayerByID() {
 }
 
 //cache room调用
-func ReceivePlayer() {
+func RemovePlayer() {
 
 }
 
 func (room *Room)RoomInform(){
-	//todo
+
 	match :=DTO.MatchSuccessDTO{}
 	match.Roomid = room.roomid
-	//match.Players = make([]*DTO.Player,2)
-	players1 := new(DTO.Player)
-	players2 := new(DTO.Player)
-	match.Players = make([]*DTO.Player,2)
-	match.Players[0] = players1
-	match.Players[1] = players2
+	match.Players = make([]*DTO.Player,RoomPeople)
+	for i:=int32(0);i<RoomPeople;i++ {
+		match.Players[i] = new(DTO.Player)
+	}
+
 	for i:=0;i<len(room.players);i++{
 		match.Players[i].Playerid=room.players[i].PlayerID
 		match.Players[i].Name=room.players[i].Name

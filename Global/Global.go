@@ -19,3 +19,4 @@ var IDAddMu			sync.Mutex
 //var ChanMap			map[int32](chan []byte)
 var NextUserID		int32
 var NextUserIDMu	sync.Mutex
+const RoomPeople int32 = 2
