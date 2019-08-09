@@ -34,14 +34,42 @@ func main() {
 	//client.Write([]byte("i am client"))
 	client.Write(buffer.Bytes())
 	//clinet.
+	fmt.Println("正在匹配中...")
 	var message []byte
-	client.Read(message)
-	var decode NetFrame.Decode
-	decode.Read(message)
-	any := DTO.MatchSuccessDTO{}
-	proto.Unmarshal(message[decode.ReadPos:decode.Len], &any)
-	fmt.Println(decode.Len , " " , decode.Thetype , " " ,decode.Command , "",any.Roomid )
+	client.Read(message) //读到匹配成功消息
 
+
+
+	//发送移动消息
+	move := DTO.MoveDTO{}
+	move.Roomid=1
+	move.Seat=1
+	move.X=22.0
+	move.Y=33.0
+	data2, _ :=proto.Marshal(&anysend)
+	encode2 := NetFrame.NewEncode(int32(8+move.XXX_Size()), 3, 0)
+	encode2.Write()
+	var buffer2 bytes.Buffer
+	buffer2.Write(encode2.GetBytes())
+	buffer2.Write(data2)
+	client.Write(buffer2.Bytes())
+
+	var message2 []byte
+	client.Read(message2) //读到匹配成功消息
+	fmt.Println("read server ok")
+/*
+	var decode NetFrame.Decode
+
+	decode.Read(message2)
+	fmt.Println("decode ok")
+
+	any := DTO.MoveDTO{}
+	proto.Unmarshal(message2[decode.ReadPos:decode.Len+4], &any)
+	fmt.Println("unmarshal ok")
+	fmt.Println(decode.Len , " " , decode.Thetype , " " ,decode.Command , "",any.X, any.Y)
+*/
+	var message3 []byte
+	client.Read(message3) //读到匹配成功消息
 	timeTicker := time.NewTicker(time.Second * 10)
 	i := 0
 	for {
@@ -56,5 +84,10 @@ func main() {
 	}
 	// 清理计时器
 	timeTicker.Stop()
+	var ttt = 1000000
+	for ttt<0{
+		ttt--
+	}
+
 	client.Close()
 }

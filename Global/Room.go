@@ -57,10 +57,9 @@ func (room *Room)CopyRoom(cacheRoom *Room) {
 //通知消息需要的数据	4个位置playerid	4个socket
 
 //多线程执行房间
-func RoomRun(room Room) {
+func (room *Room)RoomRun() {
 	//通知当前房间玩家匹配成功
-	//RoomInform(&room)
-
+	room.RoomInform()
 	//创建定时器
 	/*ticker := time.NewTicker(5 * time.Microsecond)
 
@@ -78,39 +77,32 @@ func RoomRun(room Room) {
 func (room *Room) InsertPlayer(playerid int32, client net.Conn) {
 	//roomFull
 	RoomCacheMu.Lock()
-	fmt.Println("matching")
 	insertSuccess := false
 	if !room.isfull {
-		fmt.Println("isfull")
 		for i:=0;i<len(room.players);i++{
 			if(room.players[i].PlayerID==-1){
 				room.players[i].PlayerID = playerid
 				room.players[i].PlayerClient = client
 				insertSuccess = true
-				fmt.Println("match one")
 				break
 			}
 		}
 	}
 	fmt.Println(insertSuccess)
 	if insertSuccess {
-		fmt.Println("被执行")
 		room.playernum++
 	}
 	if room.playernum == 2 {
-		fmt.Println("match two people")
 		RoomCache.roomid = NextRoomID
 		RoomMng[NextRoomID] = NewRoom()
 		RoomMng[NextRoomID].CopyRoom(&RoomCache)
-		fmt.Println("map ok")
 		//ChanMap[NextRoomID] = make(chan []byte)
 		NextRoomID++
 		RoomCache.Clear()
-//		RoomInform(RoomMng[NextRoomID-1])
 		RoomMng[NextRoomID-1].RoomInform()
+		//go RoomMng[NextRoomID-1].RoomRun()
 	}
 	RoomCacheMu.Unlock()
-	fmt.Println("match one success")
 }
 
 func (room *Room) findPlayerByID() {
@@ -124,34 +116,42 @@ func ReceivePlayer() {
 
 func (room *Room)RoomInform(){
 	//todo
-	fmt.Println("inform")
 	match :=DTO.MatchSuccessDTO{}
 	match.Roomid = room.roomid
-	fmt.Println(len(room.players))
 	//match.Players = make([]*DTO.Player,2)
 	players1 := new(DTO.Player)
 	players2 := new(DTO.Player)
 	match.Players = make([]*DTO.Player,2)
 	match.Players[0] = players1
 	match.Players[1] = players2
-	fmt.Println("panic make")
 	for i:=0;i<len(room.players);i++{
 		match.Players[i].Playerid=room.players[i].PlayerID
-		fmt.Println("panic [i]")
 		match.Players[i].Name=room.players[i].Name
 		match.Players[i].Roleid=room.players[i].PlayerRole
 		match.Players[i].Seat=int32(i+1)
 	}
-	fmt.Println("match ok")
 	data, _:=proto.Marshal(&match)
 	encode :=NetFrame.NewEncode(int32(8+match.XXX_Size()), 2,4)
 	encode.Write()
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())
 	buffer.Write(data)
-	fmt.Println("buffer ok")
 	for i:=0;i<len(room.players);i++ {
 		room.players[i].PlayerClient.Write(buffer.Bytes())
 	}
-	fmt.Println("room inform ok")
+	fmt.Println("inform ok")
+}
+
+func (room *Room)RoomBroad(move *DTO.MoveDTO){
+	fmt.Println("room broad")
+	encode :=NetFrame.NewEncode(int32(8+move.XXX_Size()), 3,2)
+	encode.Write()
+	data, _:=proto.Marshal(move)
+	var buffer bytes.Buffer
+	buffer.Write(encode.GetBytes())
+	buffer.Write(data)
+	for i:=0;i<len(room.players);i++ {
+		room.players[i].PlayerClient.Write(buffer.Bytes())
+	}
+	fmt.Println("broad ok")
 }

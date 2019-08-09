@@ -1,0 +1,7 @@
+syntax = "proto3";
+enum FightTypes
+{
+	MOVE_CREQ=0;
+	SKILL_CREQ=1;
+	INFORM_SRES=2;
+}

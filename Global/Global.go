@@ -16,6 +16,6 @@ var RoomMng			map[int32]*Room	//匹配满人添加一个房间，打完清除房
 var RoomCacheMu		sync.Mutex
 var	NextRoomID		int32
 var IDAddMu			sync.Mutex
-var ChanMap			map[int32](chan []byte)
+//var ChanMap			map[int32](chan []byte)
 var NextUserID		int32
 var NextUserIDMu	sync.Mutex

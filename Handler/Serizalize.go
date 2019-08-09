@@ -1,7 +1,6 @@
 package Handler
 
 import("fmt"
-"../Global"
 	"net"
 	"../NetFrame"
 )
@@ -33,13 +32,12 @@ func DeSerizalize(msg []byte, client net.Conn){
 	case 3:
 		//fight
 		//roomManager()
-		Global.ChanMap[decode.Command] <- msg
+		//Global.ChanMap[decode.Command] <- msg
+		fmt.Println("fight")
+		fight:=NewFight(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
+		fight.ReveiveMessage()
 		break;
 	default:
 		break
 	}
-}
-
-func Serizalize(){
-
 }
