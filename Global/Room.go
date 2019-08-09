@@ -1,12 +1,12 @@
 package Global
 
 import (
-	"net"
-	"../proto/dto"
 	"../NetFrame"
-	"github.com/golang/protobuf/proto"
+	"../proto/dto"
 	"bytes"
 	"fmt"
+	"github.com/golang/protobuf/proto"
+	"net"
 )
 
 //import "../Global"
@@ -39,7 +39,7 @@ func (room *Room) Clear() {
 	room.isfull = false
 	room.playernum = 0
 	for i:=0;i<len(room.players);i++{
-		room.players[i].PlayerID=0
+		room.players[i].PlayerID=-1
 	}
 }
 
@@ -83,7 +83,7 @@ func (room *Room) InsertPlayer(playerid int32, client net.Conn) {
 	if !room.isfull {
 		fmt.Println("isfull")
 		for i:=0;i<len(room.players);i++{
-			if(room.players[i].PlayerID==0){
+			if(room.players[i].PlayerID==-1){
 				room.players[i].PlayerID = playerid
 				room.players[i].PlayerClient = client
 				insertSuccess = true
@@ -145,6 +145,7 @@ func (room *Room)RoomInform(){
 	fmt.Println("match ok")
 	data, _:=proto.Marshal(&match)
 	encode :=NetFrame.NewEncode(int32(8+match.XXX_Size()), 2,4)
+	encode.Write()
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())
 	buffer.Write(data)
