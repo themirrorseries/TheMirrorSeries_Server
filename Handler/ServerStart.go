@@ -21,7 +21,7 @@ func recvMessage(client net.Conn) error {
 }
 
 func Start(){
-	server, err := net.Listen("tcp", "localhost:9700")
+	server, err := net.Listen("tcp", "0.0.0.0:9700")
 	if err != nil {
 		log.Fatal("start server failed!\n")
 		os.Exit(1)
