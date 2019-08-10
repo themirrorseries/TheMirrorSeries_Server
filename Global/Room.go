@@ -116,7 +116,7 @@ func (room *Room) RoomInform() {
 	match := DTO.MatchSuccessDTO{}
 	match.Roomid = room.roomid
 	// 暂时写死,后期读表
-	match.Speed = 5.0
+	match.Speed = 10
 	match.Count = 20
 	match.X = Tools.RandFloat(-1, 1, 2)
 	match.Z = Tools.RandFloat(-1, 1, 2)
