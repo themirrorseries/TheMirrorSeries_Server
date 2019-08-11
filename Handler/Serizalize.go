@@ -33,7 +33,7 @@ func DeSerizalize(msg []byte, client net.Conn){
 		//fight
 		//roomManager()
 		//Global.ChanMap[decode.Command] <- msg
-		fmt.Println("fight")
+		//fmt.Println("fight")
 		fight:=NewFight(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
 		fight.ReveiveMessage()
 		break;

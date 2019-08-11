@@ -1,11 +1,11 @@
 package Handler
 
 import (
-	"../Global"
 	"../proto/dto"
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"net"
+	"../Global"
 )
 
 type Fight struct {
@@ -40,5 +40,6 @@ func (fight *Fight) move() {
 
 	move := DTO.MoveDTO{}
 	proto.Unmarshal(fight.messages[fight.bytesStart:fight.bytesEnd], &move)
+	//Global.RoomMng[move.Roomid].RoomBroad(&move, move.Seat)
 	Global.RoomMng[move.Roomid].RoomBroad(&move)
 }

@@ -2,21 +2,20 @@ package main
 
 import (
 	"../NetFrame"
-	"log"
-	"net"
 	"os"
-	//"../Handler"
 	"../proto/dto"
 	"bytes"
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	"time"
+	"net"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	//client, err := net.Dial("tcp", "122.114.109.198:9700")
-	//client, err := net.Dial("tcp", "localhost:9700")
-	client, err := net.Dial("tcp", "mirror.murmur.top:9700")
+	client, err := net.Dial("tcp", "localhost:9700")
+	//client, err := net.Dial("tcp", "mirror.murmur.top:9700")
 	if err != nil {
 		log.Fatal("Client is dailing failed!")
 		os.Exit(1)
@@ -37,6 +36,7 @@ func main() {
 	//clinet.
 	fmt.Println("正在匹配中...")
 	var message []byte
+	message = make([]byte, 1024)
 	client.Read(message) //读到匹配成功消息
 
 	//发送移动消息
@@ -45,7 +45,8 @@ func main() {
 	move.Seat = 1
 	move.X = 22.0
 	move.Y = 33.0
-	data2, _ := proto.Marshal(&anysend)
+	move.DeltaTime = 10.0
+	data2, _ := proto.Marshal(&move)
 	encode2 := NetFrame.NewEncode(int32(8+move.XXX_Size()), 3, 0)
 	encode2.Write()
 	var buffer2 bytes.Buffer
@@ -54,19 +55,20 @@ func main() {
 	client.Write(buffer2.Bytes())
 
 	var message2 []byte
-	client.Read(message2) //读到匹配成功消息
+	message2 = make([]byte, 1024)
+	len,_:=client.Read(message2) //读到移动消息
 	fmt.Println("read server ok")
-	/*
+
 		var decode NetFrame.Decode
 
-		decode.Read(message2)
+		decode.Read(message2[0:len])
 		fmt.Println("decode ok")
 
 		any := DTO.MoveDTO{}
 		proto.Unmarshal(message2[decode.ReadPos:decode.Len+4], &any)
 		fmt.Println("unmarshal ok")
 		fmt.Println(decode.Len , " " , decode.Thetype , " " ,decode.Command , "",any.X, any.Y)
-	*/
+
 	var message3 []byte
 	client.Read(message3) //读到匹配成功消息
 	timeTicker := time.NewTicker(time.Second * 10)

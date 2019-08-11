@@ -2,8 +2,9 @@ package Handler
 
 import (
 	"net"
-	"log"
 	"os"
+	log "github.com/sirupsen/logrus"
+
 )
 
 func recvMessage(client net.Conn) error {
@@ -11,6 +12,9 @@ func recvMessage(client net.Conn) error {
 	message = make([]byte, 1024)
 
 	for {
+		if client == nil {
+			return client.Close()
+		}
 		len, _ := client.Read(message)
 		if len > 0 {
 			//log.Println(string(message[0:len]))

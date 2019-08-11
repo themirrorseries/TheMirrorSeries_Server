@@ -10,8 +10,6 @@ import (
 	"net"
 )
 
-//import "../Global"
-// map<roomid, room>
 type PlayerList struct {
 	PlayerID     int32
 	Name         string
@@ -122,7 +120,7 @@ func (room *Room) RoomInform() {
 
 	// 暂时写死,后期读表
 	match.Speed = 10
-	match.Count = 99
+	match.Count = 20
 	match.X = Tools.RandFloat(-1, 1, 2)
 	match.Z = Tools.RandFloat(-1, 1, 2)
 

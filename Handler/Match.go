@@ -1,10 +1,10 @@
 package Handler
 
-import ("fmt"
-"../Global"
+import ("../Global"
 	"net"
 	"../proto/dto"
 	"github.com/golang/protobuf/proto"
+	log "github.com/sirupsen/logrus"
 )
 
 type Match struct{
@@ -37,13 +37,13 @@ func (match *Match)ReveiveMessage(){
 		match.matchEnd()
 		break;
 	default:
-		fmt.Println("其他错误")
+		log.Println("其他错误")
 		break;
 	}
 }
 func (match *Match)matchStart(){
 	//to do
-	fmt.Println("match start")
+	log.Println("match start")
 	//add to match pool
 	//匹配也用anyDTO
 	any := DTO.MatchDTO{}
@@ -53,6 +53,6 @@ func (match *Match)matchStart(){
 
 func (match *Match)matchEnd(){
 	//to do
-	fmt.Println("match end")
+	log.Println("match end")
 	//delete from cache room
 }
