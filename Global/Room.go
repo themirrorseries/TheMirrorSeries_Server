@@ -117,7 +117,7 @@ func (room *Room) RoomInform() {
 	match.Roomid = room.roomid
 	// 暂时写死,后期读表
 	match.Speed = 10
-	match.Count = 20
+	match.Count = 99
 	match.X = Tools.RandFloat(-1, 1, 2)
 	match.Z = Tools.RandFloat(-1, 1, 2)
 	match.Players = make([]*DTO.Player, RoomPeople)
