@@ -5,9 +5,9 @@ import (
 	"../Tools"
 	"../proto/dto"
 	"bytes"
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	"net"
+	log "github.com/sirupsen/logrus"
 )
 
 type PlayerList struct {
@@ -144,12 +144,12 @@ func (room *Room) RoomInform() {
 	for i := 0; i < len(room.players); i++ {
 		room.players[i].PlayerClient.Write(buffer.Bytes())
 	}
-	fmt.Println("inform ok")
+	log.Println("inform ok")
 }
 
 func (room *Room) RoomBroad(move *DTO.MoveDTO) {
 
-	fmt.Println("room broad")
+	log.Println("room broad")
 	encode := NetFrame.NewEncode(int32(8+move.XXX_Size()), 3, 2)
 	encode.Write()
 	data, _ := proto.Marshal(move)
@@ -159,5 +159,5 @@ func (room *Room) RoomBroad(move *DTO.MoveDTO) {
 	for i := 0; i < len(room.players); i++ {
 		room.players[i].PlayerClient.Write(buffer.Bytes())
 	}
-	fmt.Println("broad ok")
+	log.Println("broad ok")
 }

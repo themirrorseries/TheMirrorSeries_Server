@@ -1,10 +1,9 @@
 package Handler
 
 import (
+	log "github.com/sirupsen/logrus"
 	"net"
 	"os"
-	log "github.com/sirupsen/logrus"
-
 )
 
 func recvMessage(client net.Conn) error {
@@ -12,8 +11,11 @@ func recvMessage(client net.Conn) error {
 	message = make([]byte, 1024)
 
 	for {
+		//it doesn't work, unless we add heart bag
 		if client == nil {
-			return client.Close()
+			//return client.Close()
+			log.Error("client out", client.Close())
+			break
 		}
 		len, _ := client.Read(message)
 		if len > 0 {
@@ -24,7 +26,7 @@ func recvMessage(client net.Conn) error {
 	return nil
 }
 
-func Start(){
+func Start() {
 	server, err := net.Listen("tcp", "0.0.0.0:9700")
 	if err != nil {
 		log.Fatal("start server failed!\n")

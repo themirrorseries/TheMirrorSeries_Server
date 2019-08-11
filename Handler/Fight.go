@@ -2,10 +2,10 @@ package Handler
 
 import (
 	"../proto/dto"
-	"fmt"
 	"github.com/golang/protobuf/proto"
 	"net"
 	"../Global"
+	log "github.com/sirupsen/logrus"
 )
 
 type Fight struct {
@@ -36,7 +36,7 @@ func (fight *Fight) ReveiveMessage() {
 }
 
 func (fight *Fight) move() {
-	fmt.Println("move start")
+	log.Println("move start")
 
 	move := DTO.MoveDTO{}
 	proto.Unmarshal(fight.messages[fight.bytesStart:fight.bytesEnd], &move)
