@@ -26,27 +26,16 @@ type Room struct {
 	players           []PlayerList
 	CurClientFrameNum int32
 	BufClientFrameNum int32
-
-	roomid    int32 //唯一id
-	isfull    bool  //是否满员
-	playernum int32 //人数
-	players   []PlayerList
 }
 
 func NewRoom() *Room {
 	room := &Room{
-
 		roomid:            0,
 		isfull:            false,
 		playernum:         0,
 		players:           make([]PlayerList, RoomPeople),
 		CurClientFrameNum: 0,
 		BufClientFrameNum: 0,
-
-		roomid:    0,
-		isfull:    false,
-		playernum: 0,
-		players:   make([]PlayerList, RoomPeople),
 	}
 	return room
 }
