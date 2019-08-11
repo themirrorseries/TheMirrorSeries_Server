@@ -2,7 +2,11 @@ syntax = "proto3";
 message MatchSuccessDTO
 {
 		int32 roomid=1;
-		repeated Player players=2; 
+		float x=2;
+		float z=3;
+		float speed=4;
+		int32 count=5;
+		repeated Player players=6; 
 }
 
 message Player{

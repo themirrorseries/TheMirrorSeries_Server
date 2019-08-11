@@ -5,4 +5,5 @@ message MoveDTO
 		int32 seat=2;
 		float x=3;
 		float y=4;
+		float deltaTime=5;
 }
