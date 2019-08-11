@@ -20,6 +20,13 @@ type PlayerList struct {
 }
 
 type Room struct {
+	roomid            int32 //唯一id
+	isfull            bool  //是否满员
+	playernum         int32 //人数
+	players           []PlayerList
+	CurClientFrameNum int32
+	BufClientFrameNum int32
+
 	roomid    int32 //唯一id
 	isfull    bool  //是否满员
 	playernum int32 //人数
@@ -28,6 +35,14 @@ type Room struct {
 
 func NewRoom() *Room {
 	room := &Room{
+
+		roomid:            0,
+		isfull:            false,
+		playernum:         0,
+		players:           make([]PlayerList, RoomPeople),
+		CurClientFrameNum: 0,
+		BufClientFrameNum: 0,
+
 		roomid:    0,
 		isfull:    false,
 		playernum: 0,
@@ -115,11 +130,13 @@ func (room *Room) RoomInform() {
 
 	match := DTO.MatchSuccessDTO{}
 	match.Roomid = room.roomid
+
 	// 暂时写死,后期读表
 	match.Speed = 10
 	match.Count = 99
 	match.X = Tools.RandFloat(-1, 1, 2)
 	match.Z = Tools.RandFloat(-1, 1, 2)
+
 	match.Players = make([]*DTO.Player, RoomPeople)
 	for i := int32(0); i < RoomPeople; i++ {
 		match.Players[i] = new(DTO.Player)
@@ -144,6 +161,7 @@ func (room *Room) RoomInform() {
 }
 
 func (room *Room) RoomBroad(move *DTO.MoveDTO) {
+
 	fmt.Println("room broad")
 	encode := NetFrame.NewEncode(int32(8+move.XXX_Size()), 3, 2)
 	encode.Write()
