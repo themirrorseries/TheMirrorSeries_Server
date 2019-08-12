@@ -1,7 +1,12 @@
 package main
 
-import log "github.com/sirupsen/logrus"
-func main(){
+import (
+	"fmt"
+	log "github.com/sirupsen/logrus"
+	"time"
+)
+
+func main() {
 	log.WithFields(log.Fields{
 		"animal": "walrus",
 		"size":   10,
@@ -16,4 +21,9 @@ func main(){
 		"omg":    true,
 		"number": 100,
 	}).Fatal("The ice breaks!")
+	t := time.NewTicker(time.Second)
+	for v := range t.C { // 循环channel
+		fmt.Println("hello", v)
+	}
+
 }

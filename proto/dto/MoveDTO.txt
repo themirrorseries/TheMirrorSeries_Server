@@ -1,9 +1,36 @@
 syntax = "proto3";
-message MoveDTO
+
+message dir
+{
+	float x=1;
+	float y=2;
+}
+
+message FrameInfo
+{
+		int32 Frame=1;
+		dir Move=2;
+		int32 Skillid=3;
+		dir SkillDir=4;
+}
+
+message ClientMoveDTO
 {
 		int32 Roomid=1;
-		int32 seat=2;
-		float x=3;
-		float y=4;
-		float deltaTime=5;
+		int32 Seat=2;
+		int32 Bagid=3;
+		repeated FrameInfo msg=4;
 }
+
+message ClientDto
+{
+        int32 Seat=1;
+        repeated FrameInfo msg=2;
+}
+message ServerMoveDto
+{
+		int32 Bagid=1;
+		repeated ClientDto clientInfo=2;
+}
+
+

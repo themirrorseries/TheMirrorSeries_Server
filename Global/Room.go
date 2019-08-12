@@ -6,8 +6,11 @@ import (
 	"../proto/dto"
 	"bytes"
 	"github.com/golang/protobuf/proto"
-	"net"
 	log "github.com/sirupsen/logrus"
+	"net"
+	//"time"
+	"sync"
+	"time"
 )
 
 type PlayerList struct {
@@ -18,22 +21,24 @@ type PlayerList struct {
 }
 
 type Room struct {
-	roomid            int32 //唯一id
-	isfull            bool  //是否满员
-	playernum         int32 //人数
-	players           []PlayerList
-	CurClientFrameNum int32
-	BufClientFrameNum int32
+	roomid          int32 //唯一id
+	isfull          bool  //是否满员
+	playernum       int32 //人数
+	players         []PlayerList
+	CacheMsg        []DTO.ClientMoveDTO //缓存消息，达到RoomPeople数量或者达到最长等待时间后广播一次
+	CacheMsgIndex   int32
+	CacheMsgIndexMu sync.Mutex
+	StartTime       time.Time //用于计算两次广播之间的最长等待时间
 }
 
 func NewRoom() *Room {
 	room := &Room{
-		roomid:            0,
-		isfull:            false,
-		playernum:         0,
-		players:           make([]PlayerList, RoomPeople),
-		CurClientFrameNum: 0,
-		BufClientFrameNum: 0,
+		roomid:        0,
+		isfull:        false,
+		playernum:     0,
+		players:       make([]PlayerList, RoomPeople),
+		CacheMsg:      make([]DTO.ClientMoveDTO, RoomPeople),
+		CacheMsgIndex: 0,
 	}
 	return room
 }
@@ -52,6 +57,7 @@ func (room *Room) CopyRoom(cacheRoom *Room) {
 	room.playernum = cacheRoom.playernum
 	for i := 0; i < len(cacheRoom.players); i++ {
 		room.players[i] = cacheRoom.players[i]
+		room.CacheMsg[i].Seat = 0
 	}
 }
 
@@ -62,18 +68,7 @@ func (room *Room) CopyRoom(cacheRoom *Room) {
 //多线程执行房间 not use now
 func (room *Room) RoomRun() {
 	//通知当前房间玩家匹配成功
-	//room.RoomInform()
-	//创建定时器
-	/*ticker := time.NewTicker(5 * time.Microsecond)
-
-	for{
-		if(false){
-			break
-		}
-		<-ticker.C
-		//ChanMap[room.roomid]
-	}*/
-
+	room.RoomInform()
 }
 
 //cache room调用
@@ -145,14 +140,31 @@ func (room *Room) RoomInform() {
 		room.players[i].PlayerClient.Write(buffer.Bytes())
 	}
 	log.Println("inform ok")
+
+	room.StartTime = time.Now()
 }
 
-func (room *Room) RoomBroad(move *DTO.MoveDTO) {
-
+func (room *Room) RoomBroad() {
+	//如果某个玩家的消息没收到	Seat设置为0
 	log.Println("room broad")
-	encode := NetFrame.NewEncode(int32(8+move.XXX_Size()), 3, 2)
+
+	//广播信息结构 第一层 帧号 自定CacheMsg[i].Bagid
+	// 第二层 4个客户端信息（Seat, FrameInfo）Seat=CacheMsg[i].Seat	FrameInfo CacheMsg[i].FrameInfo
+
+	send := DTO.ServerMoveDto{}
+	send.Bagid = room.CacheMsg[0].Bagid
+
+	for i := int32(0); i < RoomPeople; i++ {
+		if room.CacheMsg[i].Seat != 0 {
+			send.ClientInfo[i].Seat = room.CacheMsg[i].Seat
+			send.ClientInfo[i].Msg = room.CacheMsg[i].Msg
+		} else {
+			break
+		}
+	}
+	data, _ := proto.Marshal(&send)
+	encode := NetFrame.NewEncode(int32(8+send.XXX_Size()), 3, 2)
 	encode.Write()
-	data, _ := proto.Marshal(move)
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())
 	buffer.Write(data)
@@ -160,4 +172,26 @@ func (room *Room) RoomBroad(move *DTO.MoveDTO) {
 		room.players[i].PlayerClient.Write(buffer.Bytes())
 	}
 	log.Println("broad ok")
+
+	//广播完后重置缓存消息和时间
+	room.ClearCacheMsg()
+	room.StartTime = time.Now()
+}
+
+//客户端发来一个包，当缓存中包的数量为RoomPeople或者距离上一次发送过了9毫秒 就广播一次
+func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
+	room.CacheMsgIndexMu.Lock()
+	room.CacheMsg[room.CacheMsgIndex] = *move
+	room.CacheMsgIndex++
+	if room.CacheMsgIndex == RoomPeople || time.Since(room.StartTime) >= time.Duration(time.Millisecond*9) {
+		room.RoomBroad()
+	}
+	room.CacheMsgIndexMu.Unlock()
+}
+
+func (room *Room) ClearCacheMsg() {
+	for i := int32(0); i < RoomPeople; i++ {
+		room.CacheMsg[i].Seat = 0
+	}
+	room.CacheMsgIndex = 0
 }
