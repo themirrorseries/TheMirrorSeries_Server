@@ -141,6 +141,7 @@ func (room *Room) RoomInform() {
 	}
 	log.Println("inform ok")
 
+	//room.RoomStartInit()
 	room.StartTime = time.Now()
 }
 
@@ -154,7 +155,18 @@ func (room *Room) RoomBroad() {
 	send := DTO.ServerMoveDto{}
 	send.Bagid = room.CacheMsg[0].Bagid
 
+	//需要自己分配内存
+	TmpClientMoveDTO := make([]DTO.ClientDto, RoomPeople)
+	TmpFrameInfo := make([]DTO.FrameInfo, RoomPeople)
+	send.ClientInfo = make([]*DTO.ClientDto, RoomPeople)
 	for i := int32(0); i < RoomPeople; i++ {
+		send.ClientInfo[i] = &TmpClientMoveDTO[i]
+		send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, 5)
+		for j := int32(0); j < RoomPeople; j++ {
+			send.ClientInfo[i].Msg[j] = &TmpFrameInfo[j]
+			send.ClientInfo[i].Msg[j].Move = new(DTO.Dir)
+			send.ClientInfo[i].Msg[j].SkillDir = new(DTO.Dir)
+		}
 		if room.CacheMsg[i].Seat != 0 {
 			send.ClientInfo[i].Seat = room.CacheMsg[i].Seat
 			send.ClientInfo[i].Msg = room.CacheMsg[i].Msg
@@ -180,6 +192,7 @@ func (room *Room) RoomBroad() {
 
 //客户端发来一个包，当缓存中包的数量为RoomPeople或者距离上一次发送过了9毫秒 就广播一次
 func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
+	log.Println("insert bag")
 	room.CacheMsgIndexMu.Lock()
 	room.CacheMsg[room.CacheMsgIndex] = *move
 	room.CacheMsgIndex++

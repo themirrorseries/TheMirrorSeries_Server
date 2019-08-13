@@ -2,14 +2,14 @@ package main
 
 import (
 	"../NetFrame"
-	"os"
 	"../proto/dto"
 	"bytes"
 	"fmt"
 	"github.com/golang/protobuf/proto"
-	"time"
-	"net"
 	log "github.com/sirupsen/logrus"
+	"net"
+	"os"
+	"time"
 )
 
 func main() {
@@ -40,13 +40,21 @@ func main() {
 	client.Read(message) //读到匹配成功消息
 
 	//发送移动消息
-	move := DTO.MoveDTO{}
+	move := DTO.ClientMoveDTO{}
+	Msg := make([]DTO.FrameInfo, 1)
+	move.Msg = make([]*DTO.FrameInfo, 1)
+	move.Msg[0] = &Msg[0]
 	move.Roomid = 1
 	move.Seat = 1
-	move.X = 22.0
-	move.Y = 33.0
-	move.DeltaTime = 10.0
+	move.Bagid = 1
+	move.Msg[0].Frame = 1
+
+	move.Msg[0].Move = new(DTO.Dir)
+	move.Msg[0].Move.X = 11
+	move.Msg[0].Move.Y = 22
+
 	data2, _ := proto.Marshal(&move)
+
 	encode2 := NetFrame.NewEncode(int32(8+move.XXX_Size()), 3, 0)
 	encode2.Write()
 	var buffer2 bytes.Buffer
@@ -56,20 +64,22 @@ func main() {
 
 	var message2 []byte
 	message2 = make([]byte, 1024)
-	len,_:=client.Read(message2) //读到移动消息
+	len, _ := client.Read(message2) //读到移动消息
+	//client.Read(message2) //读到移动消息
 	fmt.Println("read server ok")
+	var decode NetFrame.Decode
 
-		var decode NetFrame.Decode
+	decode.Read(message2[0:len])
+	fmt.Println("decode ok")
 
-		decode.Read(message2[0:len])
-		fmt.Println("decode ok")
-
-		any := DTO.MoveDTO{}
-		proto.Unmarshal(message2[decode.ReadPos:decode.Len+4], &any)
-		fmt.Println("unmarshal ok")
-		fmt.Println(decode.Len , " " , decode.Thetype , " " ,decode.Command , "",any.X, any.Y)
+	any := DTO.ServerMoveDto{}
+	proto.Unmarshal(message2[decode.ReadPos:decode.Len+4], &any)
+	fmt.Println("unmarshal ok")
+	fmt.Println(decode.Len, " ", decode.Thetype, " ", decode.Command, "", any.Bagid, any.ClientInfo[0].Msg[0].Move.X)
 
 	var message3 []byte
+	message3 = make([]byte, 1024)
+	client.Read(message3) //读到匹配成功消息
 	client.Read(message3) //读到匹配成功消息
 	timeTicker := time.NewTicker(time.Second * 10)
 	i := 0

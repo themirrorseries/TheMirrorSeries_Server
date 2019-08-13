@@ -1,42 +1,43 @@
 package Handler
 
-import("fmt"
-	"net"
+import (
 	"../NetFrame"
+	"fmt"
+	"net"
 )
 
-
-func DeSerizalize(msg []byte, client net.Conn){
+func DeSerizalize(msg []byte, client net.Conn) {
 	var decode NetFrame.Decode
-	decode.Read(msg);
-	
+	decode.Read(msg)
+
 	fmt.Println(decode.Len)
-	
+
 	//HANDLER CENTER
-	switch(decode.Thetype){
-	case 0:{
+	switch decode.Thetype {
+	case 0:
+		{
 			login := NewLogin(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
 			login.ReveiveMessage()
 			//return login
-	}
-		break;
-	
+		}
+		break
+
 	case 1:
 		//user
-		break;
+		break
 	case 2:
 		//match
-		match:=NewMatch(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
+		match := NewMatch(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
 		match.ReveiveMessage()
-		break;
+		break
 	case 3:
 		//fight
 		//roomManager()
 		//Global.ChanMap[decode.Command] <- msg
-		//fmt.Println("fight")
-		fight:=NewFight(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
+		fmt.Println("fight")
+		fight := NewFight(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
 		fight.ReveiveMessage()
-		break;
+		break
 	default:
 		break
 	}
