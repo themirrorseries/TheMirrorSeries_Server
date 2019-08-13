@@ -157,12 +157,12 @@ func (room *Room) RoomBroad() {
 
 	//需要自己分配内存
 	TmpClientMoveDTO := make([]DTO.ClientDto, RoomPeople)
-	TmpFrameInfo := make([]DTO.FrameInfo, RoomPeople)
+	TmpFrameInfo := make([]DTO.FrameInfo, FramesPerBag)
 	send.ClientInfo = make([]*DTO.ClientDto, RoomPeople)
 	for i := int32(0); i < RoomPeople; i++ {
 		send.ClientInfo[i] = &TmpClientMoveDTO[i]
 		send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, 5)
-		for j := int32(0); j < RoomPeople; j++ {
+		for j := int32(0); j < FramesPerBag; j++ {
 			send.ClientInfo[i].Msg[j] = &TmpFrameInfo[j]
 			send.ClientInfo[i].Msg[j].Move = new(DTO.Dir)
 			send.ClientInfo[i].Msg[j].SkillDir = new(DTO.Dir)

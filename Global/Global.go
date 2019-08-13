@@ -14,3 +14,4 @@ var NextUserID int32
 var NextUserIDMu sync.Mutex
 
 const RoomPeople int32 = 2
+const FramesPerBag int32 = 5
