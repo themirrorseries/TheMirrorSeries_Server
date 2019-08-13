@@ -22,19 +22,19 @@ public static partial class MoveDTOReflection {
   static MoveDTOReflection() {
     byte[] descriptorData = global::System.Convert.FromBase64String(
         string.Concat(
-          "ChVwcm90by9kdG8vTW92ZURUTy50eHQiIQoJRGlyZWN0aW9uEgkKAXgYASAB",
-          "KAISCQoBeRgCIAEoAiJjCglGcmFtZUluZm8SDQoFRnJhbWUYASABKAUSGAoE",
-          "TW92ZRgCIAEoCzIKLkRpcmVjdGlvbhIPCgdTa2lsbGlkGAMgASgFEhwKCFNr",
-          "aWxsRGlyGAQgASgLMgouRGlyZWN0aW9uIlUKDUNsaWVudE1vdmVEVE8SDgoG",
-          "Um9vbWlkGAEgASgFEgwKBFNlYXQYAiABKAUSDQoFQmFnaWQYAyABKAUSFwoD",
-          "bXNnGAQgAygLMgouRnJhbWVJbmZvIjIKCUNsaWVudERUTxIMCgRTZWF0GAEg",
-          "ASgFEhcKA21zZxgCIAMoCzIKLkZyYW1lSW5mbyI+Cg1TZXJ2ZXJNb3ZlRFRP",
-          "Eg0KBUJhZ2lkGAEgASgFEh4KCmNsaWVudEluZm8YAiADKAsyCi5DbGllbnRE",
-          "VE9iBnByb3RvMw=="));
+          "ChVwcm90by9kdG8vTW92ZURUTy50eHQiOQoORGVsdGFEaXJlY3Rpb24SCQoB",
+          "eBgBIAEoAhIJCgF5GAIgASgCEhEKCWRlbHRhVGltZRgDIAEoAiJtCglGcmFt",
+          "ZUluZm8SDQoFRnJhbWUYASABKAUSHQoETW92ZRgCIAEoCzIPLkRlbHRhRGly",
+          "ZWN0aW9uEg8KB1NraWxsaWQYAyABKAUSIQoIU2tpbGxEaXIYBCABKAsyDy5E",
+          "ZWx0YURpcmVjdGlvbiJVCg1DbGllbnRNb3ZlRFRPEg4KBlJvb21pZBgBIAEo",
+          "BRIMCgRTZWF0GAIgASgFEg0KBUJhZ2lkGAMgASgFEhcKA21zZxgEIAMoCzIK",
+          "LkZyYW1lSW5mbyIyCglDbGllbnREVE8SDAoEU2VhdBgBIAEoBRIXCgNtc2cY",
+          "AiADKAsyCi5GcmFtZUluZm8iPgoNU2VydmVyTW92ZURUTxINCgVCYWdpZBgB",
+          "IAEoBRIeCgpjbGllbnRJbmZvGAIgAygLMgouQ2xpZW50RFRPYgZwcm90bzM="));
     descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
         new pbr::FileDescriptor[] { },
         new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-          new pbr::GeneratedClrTypeInfo(typeof(global::Direction), global::Direction.Parser, new[]{ "X", "Y" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::DeltaDirection), global::DeltaDirection.Parser, new[]{ "X", "Y", "DeltaTime" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::FrameInfo), global::FrameInfo.Parser, new[]{ "Frame", "Move", "Skillid", "SkillDir" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::ClientMoveDTO), global::ClientMoveDTO.Parser, new[]{ "Roomid", "Seat", "Bagid", "Msg" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::ClientDTO), global::ClientDTO.Parser, new[]{ "Seat", "Msg" }, null, null, null, null),
@@ -45,11 +45,11 @@ public static partial class MoveDTOReflection {
 
 }
 #region Messages
-public sealed partial class Direction : pb::IMessage<Direction> {
-  private static readonly pb::MessageParser<Direction> _parser = new pb::MessageParser<Direction>(() => new Direction());
+public sealed partial class DeltaDirection : pb::IMessage<DeltaDirection> {
+  private static readonly pb::MessageParser<DeltaDirection> _parser = new pb::MessageParser<DeltaDirection>(() => new DeltaDirection());
   private pb::UnknownFieldSet _unknownFields;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<Direction> Parser { get { return _parser; } }
+  public static pb::MessageParser<DeltaDirection> Parser { get { return _parser; } }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
@@ -62,22 +62,23 @@ public sealed partial class Direction : pb::IMessage<Direction> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public Direction() {
+  public DeltaDirection() {
     OnConstruction();
   }
 
   partial void OnConstruction();
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public Direction(Direction other) : this() {
+  public DeltaDirection(DeltaDirection other) : this() {
     x_ = other.x_;
     y_ = other.y_;
+    deltaTime_ = other.deltaTime_;
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public Direction Clone() {
-    return new Direction(this);
+  public DeltaDirection Clone() {
+    return new DeltaDirection(this);
   }
 
   /// <summary>Field number for the "x" field.</summary>
@@ -102,13 +103,24 @@ public sealed partial class Direction : pb::IMessage<Direction> {
     }
   }
 
+  /// <summary>Field number for the "deltaTime" field.</summary>
+  public const int DeltaTimeFieldNumber = 3;
+  private float deltaTime_;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public override bool Equals(object other) {
-    return Equals(other as Direction);
+  public float DeltaTime {
+    get { return deltaTime_; }
+    set {
+      deltaTime_ = value;
+    }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(Direction other) {
+  public override bool Equals(object other) {
+    return Equals(other as DeltaDirection);
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  public bool Equals(DeltaDirection other) {
     if (ReferenceEquals(other, null)) {
       return false;
     }
@@ -117,6 +129,7 @@ public sealed partial class Direction : pb::IMessage<Direction> {
     }
     if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(X, other.X)) return false;
     if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(Y, other.Y)) return false;
+    if (!pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.Equals(DeltaTime, other.DeltaTime)) return false;
     return Equals(_unknownFields, other._unknownFields);
   }
 
@@ -125,6 +138,7 @@ public sealed partial class Direction : pb::IMessage<Direction> {
     int hash = 1;
     if (X != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(X);
     if (Y != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(Y);
+    if (DeltaTime != 0F) hash ^= pbc::ProtobufEqualityComparers.BitwiseSingleEqualityComparer.GetHashCode(DeltaTime);
     if (_unknownFields != null) {
       hash ^= _unknownFields.GetHashCode();
     }
@@ -146,6 +160,10 @@ public sealed partial class Direction : pb::IMessage<Direction> {
       output.WriteRawTag(21);
       output.WriteFloat(Y);
     }
+    if (DeltaTime != 0F) {
+      output.WriteRawTag(29);
+      output.WriteFloat(DeltaTime);
+    }
     if (_unknownFields != null) {
       _unknownFields.WriteTo(output);
     }
@@ -160,6 +178,9 @@ public sealed partial class Direction : pb::IMessage<Direction> {
     if (Y != 0F) {
       size += 1 + 4;
     }
+    if (DeltaTime != 0F) {
+      size += 1 + 4;
+    }
     if (_unknownFields != null) {
       size += _unknownFields.CalculateSize();
     }
@@ -167,7 +188,7 @@ public sealed partial class Direction : pb::IMessage<Direction> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(Direction other) {
+  public void MergeFrom(DeltaDirection other) {
     if (other == null) {
       return;
     }
@@ -176,6 +197,9 @@ public sealed partial class Direction : pb::IMessage<Direction> {
     }
     if (other.Y != 0F) {
       Y = other.Y;
+    }
+    if (other.DeltaTime != 0F) {
+      DeltaTime = other.DeltaTime;
     }
     _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
   }
@@ -194,6 +218,10 @@ public sealed partial class Direction : pb::IMessage<Direction> {
         }
         case 21: {
           Y = input.ReadFloat();
+          break;
+        }
+        case 29: {
+          DeltaTime = input.ReadFloat();
           break;
         }
       }
@@ -252,9 +280,9 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
 
   /// <summary>Field number for the "Move" field.</summary>
   public const int MoveFieldNumber = 2;
-  private global::Direction move_;
+  private global::DeltaDirection move_;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public global::Direction Move {
+  public global::DeltaDirection Move {
     get { return move_; }
     set {
       move_ = value;
@@ -274,9 +302,9 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
 
   /// <summary>Field number for the "SkillDir" field.</summary>
   public const int SkillDirFieldNumber = 4;
-  private global::Direction skillDir_;
+  private global::DeltaDirection skillDir_;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public global::Direction SkillDir {
+  public global::DeltaDirection SkillDir {
     get { return skillDir_; }
     set {
       skillDir_ = value;
@@ -375,7 +403,7 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
     }
     if (other.move_ != null) {
       if (move_ == null) {
-        Move = new global::Direction();
+        Move = new global::DeltaDirection();
       }
       Move.MergeFrom(other.Move);
     }
@@ -384,7 +412,7 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
     }
     if (other.skillDir_ != null) {
       if (skillDir_ == null) {
-        SkillDir = new global::Direction();
+        SkillDir = new global::DeltaDirection();
       }
       SkillDir.MergeFrom(other.SkillDir);
     }
@@ -405,7 +433,7 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
         }
         case 18: {
           if (move_ == null) {
-            Move = new global::Direction();
+            Move = new global::DeltaDirection();
           }
           input.ReadMessage(Move);
           break;
@@ -416,7 +444,7 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
         }
         case 34: {
           if (skillDir_ == null) {
-            SkillDir = new global::Direction();
+            SkillDir = new global::DeltaDirection();
           }
           input.ReadMessage(SkillDir);
           break;

@@ -164,8 +164,8 @@ func (room *Room) RoomBroad() {
 		send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, 5)
 		for j := int32(0); j < FramesPerBag; j++ {
 			send.ClientInfo[i].Msg[j] = &TmpFrameInfo[j]
-			send.ClientInfo[i].Msg[j].Move = new(DTO.Direction)
-			send.ClientInfo[i].Msg[j].SkillDir = new(DTO.Direction)
+			send.ClientInfo[i].Msg[j].Move = new(DTO.DeltaDirection)
+			send.ClientInfo[i].Msg[j].SkillDir = new(DTO.DeltaDirection)
 		}
 		if room.CacheMsg[i].Seat != 0 {
 			send.ClientInfo[i].Seat = room.CacheMsg[i].Seat

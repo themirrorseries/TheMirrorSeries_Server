@@ -1,17 +1,18 @@
 syntax = "proto3";
 
-message Direction
+message DeltaDirection
 {
 	float x=1;
 	float y=2;
+	float deltaTime=3;
 }
 
 message FrameInfo
 {
 		int32 Frame=1;
-		Direction Move=2;
+		DeltaDirection Move=2;
 		int32 Skillid=3;
-		Direction SkillDir=4;
+		DeltaDirection SkillDir=4;
 }
 
 message ClientMoveDTO
