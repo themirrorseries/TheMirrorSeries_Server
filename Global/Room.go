@@ -152,20 +152,20 @@ func (room *Room) RoomBroad() {
 	//广播信息结构 第一层 帧号 自定CacheMsg[i].Bagid
 	// 第二层 4个客户端信息（Seat, FrameInfo）Seat=CacheMsg[i].Seat	FrameInfo CacheMsg[i].FrameInfo
 
-	send := DTO.ServerMoveDto{}
+	send := DTO.ServerMoveDTO{}
 	send.Bagid = room.CacheMsg[0].Bagid
 
 	//需要自己分配内存
-	TmpClientMoveDTO := make([]DTO.ClientDto, RoomPeople)
+	TmpClientMoveDTO := make([]DTO.ClientDTO, RoomPeople)
 	TmpFrameInfo := make([]DTO.FrameInfo, FramesPerBag)
-	send.ClientInfo = make([]*DTO.ClientDto, RoomPeople)
+	send.ClientInfo = make([]*DTO.ClientDTO, RoomPeople)
 	for i := int32(0); i < RoomPeople; i++ {
 		send.ClientInfo[i] = &TmpClientMoveDTO[i]
 		send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, 5)
 		for j := int32(0); j < FramesPerBag; j++ {
 			send.ClientInfo[i].Msg[j] = &TmpFrameInfo[j]
-			send.ClientInfo[i].Msg[j].Move = new(DTO.Dir)
-			send.ClientInfo[i].Msg[j].SkillDir = new(DTO.Dir)
+			send.ClientInfo[i].Msg[j].Move = new(DTO.Direction)
+			send.ClientInfo[i].Msg[j].SkillDir = new(DTO.Direction)
 		}
 		if room.CacheMsg[i].Seat != 0 {
 			send.ClientInfo[i].Seat = room.CacheMsg[i].Seat

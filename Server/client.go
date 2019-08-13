@@ -49,7 +49,7 @@ func main() {
 	move.Bagid = 1
 	move.Msg[0].Frame = 1
 
-	move.Msg[0].Move = new(DTO.Dir)
+	move.Msg[0].Move = new(DTO.Direction)
 	move.Msg[0].Move.X = 11
 	move.Msg[0].Move.Y = 22
 
@@ -72,7 +72,7 @@ func main() {
 	decode.Read(message2[0:len])
 	fmt.Println("decode ok")
 
-	any := DTO.ServerMoveDto{}
+	any := DTO.ServerMoveDTO{}
 	proto.Unmarshal(message2[decode.ReadPos:decode.Len+4], &any)
 	fmt.Println("unmarshal ok")
 	fmt.Println(decode.Len, " ", decode.Thetype, " ", decode.Command, "", any.Bagid, any.ClientInfo[0].Msg[0].Move.X)

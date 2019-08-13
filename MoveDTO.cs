@@ -22,33 +22,34 @@ public static partial class MoveDTOReflection {
   static MoveDTOReflection() {
     byte[] descriptorData = global::System.Convert.FromBase64String(
         string.Concat(
-          "ChVwcm90by9kdG8vTW92ZURUTy50eHQiGwoDZGlyEgkKAXgYASABKAISCQoB",
-          "eRgCIAEoAiJXCglGcmFtZUluZm8SDQoFRnJhbWUYASABKAUSEgoETW92ZRgC",
-          "IAEoCzIELmRpchIPCgdTa2lsbGlkGAMgASgFEhYKCFNraWxsRGlyGAQgASgL",
-          "MgQuZGlyIlUKDUNsaWVudE1vdmVEVE8SDgoGUm9vbWlkGAEgASgFEgwKBFNl",
-          "YXQYAiABKAUSDQoFQmFnaWQYAyABKAUSFwoDbXNnGAQgAygLMgouRnJhbWVJ",
-          "bmZvIjIKCUNsaWVudER0bxIMCgRTZWF0GAEgASgFEhcKA21zZxgCIAMoCzIK",
-          "LkZyYW1lSW5mbyI+Cg1TZXJ2ZXJNb3ZlRHRvEg0KBUJhZ2lkGAEgASgFEh4K",
-          "CmNsaWVudEluZm8YAiADKAsyCi5DbGllbnREdG9iBnByb3RvMw=="));
+          "ChVwcm90by9kdG8vTW92ZURUTy50eHQiIQoJRGlyZWN0aW9uEgkKAXgYASAB",
+          "KAISCQoBeRgCIAEoAiJjCglGcmFtZUluZm8SDQoFRnJhbWUYASABKAUSGAoE",
+          "TW92ZRgCIAEoCzIKLkRpcmVjdGlvbhIPCgdTa2lsbGlkGAMgASgFEhwKCFNr",
+          "aWxsRGlyGAQgASgLMgouRGlyZWN0aW9uIlUKDUNsaWVudE1vdmVEVE8SDgoG",
+          "Um9vbWlkGAEgASgFEgwKBFNlYXQYAiABKAUSDQoFQmFnaWQYAyABKAUSFwoD",
+          "bXNnGAQgAygLMgouRnJhbWVJbmZvIjIKCUNsaWVudERUTxIMCgRTZWF0GAEg",
+          "ASgFEhcKA21zZxgCIAMoCzIKLkZyYW1lSW5mbyI+Cg1TZXJ2ZXJNb3ZlRFRP",
+          "Eg0KBUJhZ2lkGAEgASgFEh4KCmNsaWVudEluZm8YAiADKAsyCi5DbGllbnRE",
+          "VE9iBnByb3RvMw=="));
     descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
         new pbr::FileDescriptor[] { },
         new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-          new pbr::GeneratedClrTypeInfo(typeof(global::dir), global::dir.Parser, new[]{ "X", "Y" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::Direction), global::Direction.Parser, new[]{ "X", "Y" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::FrameInfo), global::FrameInfo.Parser, new[]{ "Frame", "Move", "Skillid", "SkillDir" }, null, null, null, null),
           new pbr::GeneratedClrTypeInfo(typeof(global::ClientMoveDTO), global::ClientMoveDTO.Parser, new[]{ "Roomid", "Seat", "Bagid", "Msg" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ClientDto), global::ClientDto.Parser, new[]{ "Seat", "Msg" }, null, null, null, null),
-          new pbr::GeneratedClrTypeInfo(typeof(global::ServerMoveDto), global::ServerMoveDto.Parser, new[]{ "Bagid", "ClientInfo" }, null, null, null, null)
+          new pbr::GeneratedClrTypeInfo(typeof(global::ClientDTO), global::ClientDTO.Parser, new[]{ "Seat", "Msg" }, null, null, null, null),
+          new pbr::GeneratedClrTypeInfo(typeof(global::ServerMoveDTO), global::ServerMoveDTO.Parser, new[]{ "Bagid", "ClientInfo" }, null, null, null, null)
         }));
   }
   #endregion
 
 }
 #region Messages
-public sealed partial class dir : pb::IMessage<dir> {
-  private static readonly pb::MessageParser<dir> _parser = new pb::MessageParser<dir>(() => new dir());
+public sealed partial class Direction : pb::IMessage<Direction> {
+  private static readonly pb::MessageParser<Direction> _parser = new pb::MessageParser<Direction>(() => new Direction());
   private pb::UnknownFieldSet _unknownFields;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<dir> Parser { get { return _parser; } }
+  public static pb::MessageParser<Direction> Parser { get { return _parser; } }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
@@ -61,22 +62,22 @@ public sealed partial class dir : pb::IMessage<dir> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public dir() {
+  public Direction() {
     OnConstruction();
   }
 
   partial void OnConstruction();
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public dir(dir other) : this() {
+  public Direction(Direction other) : this() {
     x_ = other.x_;
     y_ = other.y_;
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public dir Clone() {
-    return new dir(this);
+  public Direction Clone() {
+    return new Direction(this);
   }
 
   /// <summary>Field number for the "x" field.</summary>
@@ -103,11 +104,11 @@ public sealed partial class dir : pb::IMessage<dir> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override bool Equals(object other) {
-    return Equals(other as dir);
+    return Equals(other as Direction);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(dir other) {
+  public bool Equals(Direction other) {
     if (ReferenceEquals(other, null)) {
       return false;
     }
@@ -166,7 +167,7 @@ public sealed partial class dir : pb::IMessage<dir> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(dir other) {
+  public void MergeFrom(Direction other) {
     if (other == null) {
       return;
     }
@@ -251,9 +252,9 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
 
   /// <summary>Field number for the "Move" field.</summary>
   public const int MoveFieldNumber = 2;
-  private global::dir move_;
+  private global::Direction move_;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public global::dir Move {
+  public global::Direction Move {
     get { return move_; }
     set {
       move_ = value;
@@ -273,9 +274,9 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
 
   /// <summary>Field number for the "SkillDir" field.</summary>
   public const int SkillDirFieldNumber = 4;
-  private global::dir skillDir_;
+  private global::Direction skillDir_;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public global::dir SkillDir {
+  public global::Direction SkillDir {
     get { return skillDir_; }
     set {
       skillDir_ = value;
@@ -374,7 +375,7 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
     }
     if (other.move_ != null) {
       if (move_ == null) {
-        Move = new global::dir();
+        Move = new global::Direction();
       }
       Move.MergeFrom(other.Move);
     }
@@ -383,7 +384,7 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
     }
     if (other.skillDir_ != null) {
       if (skillDir_ == null) {
-        SkillDir = new global::dir();
+        SkillDir = new global::Direction();
       }
       SkillDir.MergeFrom(other.SkillDir);
     }
@@ -404,7 +405,7 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
         }
         case 18: {
           if (move_ == null) {
-            Move = new global::dir();
+            Move = new global::Direction();
           }
           input.ReadMessage(Move);
           break;
@@ -415,7 +416,7 @@ public sealed partial class FrameInfo : pb::IMessage<FrameInfo> {
         }
         case 34: {
           if (skillDir_ == null) {
-            SkillDir = new global::dir();
+            SkillDir = new global::Direction();
           }
           input.ReadMessage(SkillDir);
           break;
@@ -631,11 +632,11 @@ public sealed partial class ClientMoveDTO : pb::IMessage<ClientMoveDTO> {
 
 }
 
-public sealed partial class ClientDto : pb::IMessage<ClientDto> {
-  private static readonly pb::MessageParser<ClientDto> _parser = new pb::MessageParser<ClientDto>(() => new ClientDto());
+public sealed partial class ClientDTO : pb::IMessage<ClientDTO> {
+  private static readonly pb::MessageParser<ClientDTO> _parser = new pb::MessageParser<ClientDTO>(() => new ClientDTO());
   private pb::UnknownFieldSet _unknownFields;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<ClientDto> Parser { get { return _parser; } }
+  public static pb::MessageParser<ClientDTO> Parser { get { return _parser; } }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
@@ -648,22 +649,22 @@ public sealed partial class ClientDto : pb::IMessage<ClientDto> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public ClientDto() {
+  public ClientDTO() {
     OnConstruction();
   }
 
   partial void OnConstruction();
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public ClientDto(ClientDto other) : this() {
+  public ClientDTO(ClientDTO other) : this() {
     seat_ = other.seat_;
     msg_ = other.msg_.Clone();
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public ClientDto Clone() {
-    return new ClientDto(this);
+  public ClientDTO Clone() {
+    return new ClientDTO(this);
   }
 
   /// <summary>Field number for the "Seat" field.</summary>
@@ -689,11 +690,11 @@ public sealed partial class ClientDto : pb::IMessage<ClientDto> {
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override bool Equals(object other) {
-    return Equals(other as ClientDto);
+    return Equals(other as ClientDTO);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(ClientDto other) {
+  public bool Equals(ClientDTO other) {
     if (ReferenceEquals(other, null)) {
       return false;
     }
@@ -747,7 +748,7 @@ public sealed partial class ClientDto : pb::IMessage<ClientDto> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(ClientDto other) {
+  public void MergeFrom(ClientDTO other) {
     if (other == null) {
       return;
     }
@@ -780,11 +781,11 @@ public sealed partial class ClientDto : pb::IMessage<ClientDto> {
 
 }
 
-public sealed partial class ServerMoveDto : pb::IMessage<ServerMoveDto> {
-  private static readonly pb::MessageParser<ServerMoveDto> _parser = new pb::MessageParser<ServerMoveDto>(() => new ServerMoveDto());
+public sealed partial class ServerMoveDTO : pb::IMessage<ServerMoveDTO> {
+  private static readonly pb::MessageParser<ServerMoveDTO> _parser = new pb::MessageParser<ServerMoveDTO>(() => new ServerMoveDTO());
   private pb::UnknownFieldSet _unknownFields;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public static pb::MessageParser<ServerMoveDto> Parser { get { return _parser; } }
+  public static pb::MessageParser<ServerMoveDTO> Parser { get { return _parser; } }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public static pbr::MessageDescriptor Descriptor {
@@ -797,22 +798,22 @@ public sealed partial class ServerMoveDto : pb::IMessage<ServerMoveDto> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public ServerMoveDto() {
+  public ServerMoveDTO() {
     OnConstruction();
   }
 
   partial void OnConstruction();
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public ServerMoveDto(ServerMoveDto other) : this() {
+  public ServerMoveDTO(ServerMoveDTO other) : this() {
     bagid_ = other.bagid_;
     clientInfo_ = other.clientInfo_.Clone();
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public ServerMoveDto Clone() {
-    return new ServerMoveDto(this);
+  public ServerMoveDTO Clone() {
+    return new ServerMoveDTO(this);
   }
 
   /// <summary>Field number for the "Bagid" field.</summary>
@@ -828,21 +829,21 @@ public sealed partial class ServerMoveDto : pb::IMessage<ServerMoveDto> {
 
   /// <summary>Field number for the "clientInfo" field.</summary>
   public const int ClientInfoFieldNumber = 2;
-  private static readonly pb::FieldCodec<global::ClientDto> _repeated_clientInfo_codec
-      = pb::FieldCodec.ForMessage(18, global::ClientDto.Parser);
-  private readonly pbc::RepeatedField<global::ClientDto> clientInfo_ = new pbc::RepeatedField<global::ClientDto>();
+  private static readonly pb::FieldCodec<global::ClientDTO> _repeated_clientInfo_codec
+      = pb::FieldCodec.ForMessage(18, global::ClientDTO.Parser);
+  private readonly pbc::RepeatedField<global::ClientDTO> clientInfo_ = new pbc::RepeatedField<global::ClientDTO>();
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public pbc::RepeatedField<global::ClientDto> ClientInfo {
+  public pbc::RepeatedField<global::ClientDTO> ClientInfo {
     get { return clientInfo_; }
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   public override bool Equals(object other) {
-    return Equals(other as ServerMoveDto);
+    return Equals(other as ServerMoveDTO);
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public bool Equals(ServerMoveDto other) {
+  public bool Equals(ServerMoveDTO other) {
     if (ReferenceEquals(other, null)) {
       return false;
     }
@@ -896,7 +897,7 @@ public sealed partial class ServerMoveDto : pb::IMessage<ServerMoveDto> {
   }
 
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-  public void MergeFrom(ServerMoveDto other) {
+  public void MergeFrom(ServerMoveDTO other) {
     if (other == null) {
       return;
     }
