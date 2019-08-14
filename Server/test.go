@@ -1,9 +1,7 @@
 package main
 
-import (
-	"../Global"
-)
+import ()
 
 func main() {
-	Global.ConnecToDB()
+
 }

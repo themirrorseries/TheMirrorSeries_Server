@@ -45,13 +45,14 @@ func main() {
 	move.Msg = make([]*DTO.FrameInfo, 1)
 	move.Msg[0] = &Msg[0]
 	move.Roomid = 1
-	move.Seat = 1
+	move.Seat = 2
 	move.Bagid = 1
 	move.Msg[0].Frame = 1
 
-	move.Msg[0].Move = new(DTO.Direction)
+	move.Msg[0].Move = new(DTO.DeltaDirection)
 	move.Msg[0].Move.X = 11
 	move.Msg[0].Move.Y = 22
+	move.Msg[0].Move.DeltaTime = 1
 
 	data2, _ := proto.Marshal(&move)
 
