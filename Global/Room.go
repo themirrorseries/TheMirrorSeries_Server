@@ -72,13 +72,14 @@ func (room *Room) RoomRun() {
 }
 
 //cache room调用
-func (room *Room) InsertPlayer(playerid int32, client net.Conn) {
+func (room *Room) InsertPlayer(playerID int32, playerRole int32, client net.Conn) {
 	//roomFull
 	RoomCacheMu.Lock()
 	if !room.isfull {
 		for i := int32(0); i < RoomPeople; i++ {
 			if room.players[i].PlayerID == -1 {
-				room.players[i].PlayerID = playerid
+				room.players[i].PlayerID = playerID
+				room.players[i].PlayerRole = playerRole
 				room.players[i].PlayerClient = client
 				break
 			}
@@ -142,7 +143,7 @@ func (room *Room) RoomInform() {
 	log.Println("inform ok")
 
 	//把新开的房间信息存入数据库
-	//AddRoom(room.roomid, &match)
+	AddRoom(RoomCollection, room.roomid, &match)
 	//room.RoomStartInit()
 }
 
@@ -177,7 +178,7 @@ func (room *Room) RoomBroad() {
 	log.Println("Roombroad ok")
 
 	//把广播的若干帧存入数据库，有可能碰到房间数据库未创建完毕就开始插入数据了
-	AddFrame(room.roomid, &send)
+	AddFrame(RoomCollection, room.roomid, &send)
 
 	//广播完后重置缓存消息和时间
 	room.ClearCacheMsg()

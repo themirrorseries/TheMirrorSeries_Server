@@ -1,6 +1,7 @@
 package Global
 
 import (
+	"gopkg.in/mgo.v2"
 	"sync"
 )
 
@@ -12,6 +13,8 @@ var IDAddMu sync.Mutex
 var ChanMap map[int32](chan []byte)
 var NextUserID int32
 var NextUserIDMu sync.Mutex
+var RoomCollection *mgo.Collection
+var UserCollection *mgo.Collection
 
 const RoomPeople int32 = 2
 const FramesPerBag int32 = 1
