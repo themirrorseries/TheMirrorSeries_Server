@@ -53,17 +53,16 @@ func (login *Login) clientLogin() {
 	//log.Println(any.Id)
 	//log.Println("dto ok")
 
-	/*
-		if(!IsExist()){
-			Global.NextUserIDMu.Lock()
-			login.SendLoginMessage(Global.NextUserID)
-			Global.NextUserID++
-			Global.NextUserIDMu.Unlock()
-		}else{
-			login.SendLoginMessage(Global.NextUserID)
-		}
-	*/
-	login.SendLoginMessage(Global.GetUser(Global.UserCollection, any.Uuid))
+	if !IsExist() {
+		Global.NextUserIDMu.Lock()
+		login.SendLoginMessage(Global.NextUserID)
+		Global.NextUserID++
+		Global.NextUserIDMu.Unlock()
+	} else {
+		login.SendLoginMessage(Global.NextUserID)
+	}
+
+	//login.SendLoginMessage(Global.GetUser(Global.UserCollection, any.Uuid))
 
 }
 

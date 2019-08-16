@@ -4,7 +4,7 @@ import (
 	"../Global"
 	"../proto/dto"
 	"github.com/golang/protobuf/proto"
-	log "github.com/sirupsen/logrus"
+	//log "github.com/sirupsen/logrus"
 	"net"
 )
 
@@ -36,11 +36,9 @@ func (fight *Fight) ReveiveMessage() {
 }
 
 func (fight *Fight) move() {
-	log.Println("move start")
 
 	move := DTO.ClientMoveDTO{}
 	proto.Unmarshal(fight.messages[fight.bytesStart:fight.bytesEnd], &move)
-	//Global.RoomMng[move.Roomid].RoomBroad(&move, move.Seat)
-	//Global.RoomMng[move.Roomid].RoomBroad(&move)
+
 	Global.RoomMng[move.Roomid].InsertMsg(&move)
 }

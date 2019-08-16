@@ -11,7 +11,7 @@ func recvMessage(client net.Conn) error {
 	message = make([]byte, 1024)
 
 	for {
-		//it doesn't work, unless we add heart bag
+		//todo it doesn't work, unless we add heart bag
 		if client == nil {
 			//return client.Close()
 			log.Error("client out", client.Close())

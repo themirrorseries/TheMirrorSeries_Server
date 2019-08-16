@@ -2,15 +2,12 @@ package Handler
 
 import (
 	"../NetFrame"
-	"fmt"
 	"net"
 )
 
 func DeSerizalize(msg []byte, client net.Conn) {
 	var decode NetFrame.Decode
 	decode.Read(msg)
-
-	fmt.Println(decode.Len)
 
 	//HANDLER CENTER
 	switch decode.Thetype {
@@ -34,7 +31,6 @@ func DeSerizalize(msg []byte, client net.Conn) {
 		//fight
 		//roomManager()
 		//Global.ChanMap[decode.Command] <- msg
-		fmt.Println("fight")
 		fight := NewFight(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
 		fight.ReveiveMessage()
 		break

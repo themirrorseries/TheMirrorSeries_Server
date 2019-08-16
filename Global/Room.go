@@ -195,7 +195,6 @@ func (room *Room) RoomBroad() {
 	for i := int32(0); i < RoomPeople; i++ {
 		room.players[i].PlayerClient.Write(buffer.Bytes())
 	}
-	log.Println("Roombroad ok")
 
 	//把广播的若干帧存入数据库，有可能碰到房间数据库未创建完毕就开始插入数据了
 	//AddFrame(RoomCollection, room.roomid, &send)
@@ -207,7 +206,6 @@ func (room *Room) RoomBroad() {
 
 //客户端发来一个包，当缓存中包的数量为RoomPeople或者距离上一次发送过了9毫秒 就广播一次
 func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
-	log.Println("insert bag")
 	room.CacheMsgIndexMu.Lock()
 	if room.CacheMsgIndex == 0 {
 		room.StartTime = time.Now()
