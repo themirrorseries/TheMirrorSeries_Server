@@ -23,34 +23,35 @@ func main() {
 
 	//测试encode与deSerialize
 	anysend := DTO.MatchDTO{}
-	anysend.Id = 2
+	anysend.Id = 1
 	data, _ := proto.Marshal(&anysend)
 	encode := NetFrame.NewEncode(int32(8+anysend.XXX_Size()), 2, 0)
 	encode.Write()
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())
 	buffer.Write(data)
-
-	//client.Write([]byte("i am client"))
 	client.Write(buffer.Bytes())
-	//clinet.
+
 	fmt.Println("正在匹配中...")
-
-	//------------取消匹配测试
-	removeMatch := DTO.MatchDTO{}
-	removeMatch.Id = 2
-	dataRemove, _ := proto.Marshal(&removeMatch)
-	encodeRemove := NetFrame.NewEncode(int32(8+removeMatch.XXX_Size()), 2, 2)
-	encodeRemove.Write()
-	var bufferRemove bytes.Buffer
-	bufferRemove.Write(encode.GetBytes())
-	bufferRemove.Write(dataRemove)
-	client.Write(bufferRemove.Bytes())
-
-	var message []byte
-	message = make([]byte, 1024)
-	client.Read(message) //读到匹配成功消息
-
+	/*
+		var message4 []byte
+		message4 = make([]byte, 1024)
+		client.Read(message4) //读到匹配返回消息
+		//------------取消匹配测试
+		removeMatch := DTO.MatchRtnDTO{}
+		removeMatch.Id = 1
+		dataRemove, _ := proto.Marshal(&removeMatch)
+		encodeRemove := NetFrame.NewEncode(int32(8+removeMatch.XXX_Size()), 2, 2)
+		encodeRemove.Write()
+		var bufferRemove bytes.Buffer
+		bufferRemove.Write(encodeRemove.GetBytes())
+		bufferRemove.Write(dataRemove)
+		client.Write(bufferRemove.Bytes())
+		fmt.Println("取消匹配...")
+		var message []byte
+		message = make([]byte, 1024)
+		client.Read(message) //读到取消匹配消息
+	*/
 	//发送移动消息
 	move := DTO.ClientMoveDTO{}
 	Msg := make([]DTO.FrameInfo, 1)
@@ -94,6 +95,7 @@ func main() {
 	message3 = make([]byte, 1024)
 	client.Read(message3) //读到匹配成功消息
 	client.Read(message3) //读到匹配成功消息
+
 	timeTicker := time.NewTicker(time.Second * 10)
 	i := 0
 	for {

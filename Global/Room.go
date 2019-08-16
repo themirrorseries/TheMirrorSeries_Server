@@ -42,7 +42,7 @@ func NewRoom() *Room {
 	return room
 }
 func (room *Room) Clear() {
-	room.roomid = 0
+	room.roomid = 1
 	room.isfull = false
 	room.playernum = 0
 	for i := int32(0); i < RoomPeople; i++ {
@@ -95,6 +95,8 @@ func (room *Room) InsertPlayer(playerID int32, playerRole int32, client net.Conn
 		RoomCache.Clear()
 		RoomMng[NextRoomID-1].RoomInform()
 		//go RoomMng[NextRoomID-1].RoomRun()
+	} else {
+		room.RoomMatchInform(1, client)
 	}
 	RoomCacheMu.Unlock()
 }
@@ -109,12 +111,14 @@ func (room *Room) RemovePlayer(playerid int32, client net.Conn) {
 		}
 	}
 	room.playernum--
-	RoomCache.RoomRemoveInform(client)
+	RoomCache.RoomMatchInform(3, client)
 	RoomCacheMu.Unlock()
 }
 
-func (room *Room) RoomRemoveInform(client net.Conn) {
-	any := DTO.AnyDTO{}
+//如果是匹配确认需要返回roomid 如果是取消匹配确认 不需要返回特殊数据
+func (room *Room) RoomMatchInform(command int32, client net.Conn) {
+	any := DTO.MatchRtnDTO{}
+	any.Cacheroomid = 1
 	data, _ := proto.Marshal(&any)
 	encode := NetFrame.NewEncode(int32(8+any.XXX_Size()), 2, 3)
 	encode.Write()

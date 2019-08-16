@@ -28,13 +28,16 @@ func NewMatch(c, start, end int32, msg []byte, _client net.Conn) *Match {
 }
 
 func (match *Match) ReveiveMessage() {
+	log.Println(match.command)
 	switch match.command {
 	case 0:
 		//申请进入匹配
+		log.Println("start match")
 		match.matchStart()
 		break
 	case 2:
 		//申请离开匹配
+		log.Println("live match")
 		match.matchEnd()
 		break
 	default:
@@ -56,7 +59,7 @@ func (match *Match) matchEnd() {
 	//to do
 	log.Println("match end")
 	//delete from cache room
-	any := DTO.MatchDTO{}
+	any := DTO.MatchRtnDTO{}
 	proto.Unmarshal(match.messages[match.bytesStart:match.bytesEnd], &any)
 	Global.RoomCache.RemovePlayer(any.Id, match.client)
 }

@@ -12,10 +12,11 @@ func main() {
 	Global.RoomCache = *Global.NewRoom()
 	Global.RoomCache.Clear()
 
-	Global.RoomCollection = Global.ConnecToRoom()
-	Global.UserCollection = Global.ConnecToUser()
+	//Global.RoomCollection = Global.ConnecToRoom()
+	//Global.UserCollection = Global.ConnecToUser()
 
 	Global.NextRoomID = 1
+	Global.NextUserID = 100000
 	//Global.NextRoomID = Global.GetLastRoomID(Global.RoomCollection) //房间ID从1开始
 	//Global.NextUserID = Global.GetLastUserID(Global.UserCollection) //用户ID从10万开始
 	fmt.Println(Global.NextRoomID, Global.NextUserID)
