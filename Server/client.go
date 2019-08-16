@@ -23,7 +23,7 @@ func main() {
 
 	//测试encode与deSerialize
 	anysend := DTO.MatchDTO{}
-	anysend.Id = 1
+	anysend.Id = 2
 	data, _ := proto.Marshal(&anysend)
 	encode := NetFrame.NewEncode(int32(8+anysend.XXX_Size()), 2, 0)
 	encode.Write()
@@ -35,6 +35,18 @@ func main() {
 	client.Write(buffer.Bytes())
 	//clinet.
 	fmt.Println("正在匹配中...")
+
+	//------------取消匹配测试
+	removeMatch := DTO.MatchDTO{}
+	removeMatch.Id = 2
+	dataRemove, _ := proto.Marshal(&removeMatch)
+	encodeRemove := NetFrame.NewEncode(int32(8+removeMatch.XXX_Size()), 2, 2)
+	encodeRemove.Write()
+	var bufferRemove bytes.Buffer
+	bufferRemove.Write(encode.GetBytes())
+	bufferRemove.Write(dataRemove)
+	client.Write(bufferRemove.Bytes())
+
 	var message []byte
 	message = make([]byte, 1024)
 	client.Read(message) //读到匹配成功消息

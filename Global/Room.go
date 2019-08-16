@@ -8,7 +8,6 @@ import (
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
 	"net"
-	//"time"
 	"sync"
 	"time"
 )
@@ -100,13 +99,30 @@ func (room *Room) InsertPlayer(playerID int32, playerRole int32, client net.Conn
 	RoomCacheMu.Unlock()
 }
 
-func (room *Room) findPlayerByID() {
-
+//cache room调用
+func (room *Room) RemovePlayer(playerid int32, client net.Conn) {
+	RoomCacheMu.Lock()
+	for i := int32(0); i < RoomPeople; i++ {
+		if room.players[i].PlayerID == playerid {
+			room.players[i].PlayerID = -1
+			break
+		}
+	}
+	room.playernum--
+	RoomCache.RoomRemoveInform(client)
+	RoomCacheMu.Unlock()
 }
 
-//cache room调用
-func RemovePlayer() {
+func (room *Room) RoomRemoveInform(client net.Conn) {
+	any := DTO.AnyDTO{}
+	data, _ := proto.Marshal(&any)
+	encode := NetFrame.NewEncode(int32(8+any.XXX_Size()), 2, 3)
+	encode.Write()
+	var buffer bytes.Buffer
+	buffer.Write(encode.GetBytes())
+	buffer.Write(data)
 
+	client.Write(buffer.Bytes())
 }
 
 func (room *Room) RoomInform() {
@@ -143,7 +159,7 @@ func (room *Room) RoomInform() {
 	log.Println("inform ok")
 
 	//把新开的房间信息存入数据库
-	AddRoom(RoomCollection, room.roomid, &match)
+	//AddRoom(RoomCollection, room.roomid, &match)
 	//room.RoomStartInit()
 }
 
@@ -178,7 +194,7 @@ func (room *Room) RoomBroad() {
 	log.Println("Roombroad ok")
 
 	//把广播的若干帧存入数据库，有可能碰到房间数据库未创建完毕就开始插入数据了
-	AddFrame(RoomCollection, room.roomid, &send)
+	//AddFrame(RoomCollection, room.roomid, &send)
 
 	//广播完后重置缓存消息和时间
 	room.ClearCacheMsg()

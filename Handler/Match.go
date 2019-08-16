@@ -56,4 +56,7 @@ func (match *Match) matchEnd() {
 	//to do
 	log.Println("match end")
 	//delete from cache room
+	any := DTO.MatchDTO{}
+	proto.Unmarshal(match.messages[match.bytesStart:match.bytesEnd], &any)
+	Global.RoomCache.RemovePlayer(any.Id, match.client)
 }
