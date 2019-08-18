@@ -12,12 +12,8 @@ func recvMessage(client net.Conn) error {
 	//var err error=!nil
 
 	for {
-		log.Error("开始读数据")
 		len, err := client.Read(message)
-		log.Error("读数据完成")
-		//todo it doesn't work, unless we add heart bag
 		if err != nil {
-			//return client.Close()
 			log.Error("client out", client.Close())
 			break
 		}
