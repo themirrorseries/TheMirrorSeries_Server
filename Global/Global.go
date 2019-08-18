@@ -16,5 +16,5 @@ var NextUserIDMu sync.Mutex
 var RoomCollection *mgo.Collection
 var UserCollection *mgo.Collection
 
-const RoomPeople int32 = 1
+const RoomPeople int32 = 2
 const FramesPerBag int32 = 3

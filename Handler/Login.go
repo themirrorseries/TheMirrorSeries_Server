@@ -31,7 +31,7 @@ func NewLogin(c, start, end int32, msg []byte, _client net.Conn) *Login {
 
 func (login *Login) ReveiveMessage() {
 	switch login.command {
-	case 0:
+	case int32(DTO.LoginTypes_LOGIN_CREQ):
 		login.clientLogin()
 		break
 	//case 2:
@@ -83,7 +83,7 @@ func (login *Login) SendLoginMessage(id int32) {
 	data, _ := proto.Marshal(&any)
 	//any.XXX_Marshal()
 	log.Println("encode ok")
-	encode := NetFrame.NewEncode(int32(8+any.XXX_Size()), 0, 1)
+	encode := NetFrame.NewEncode(int32(8+any.XXX_Size()), int32(DTO.MsgTypes_TYPE_LOGIN), int32(DTO.LoginTypes_LOGIN_SRES))
 	encode.Write()
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())

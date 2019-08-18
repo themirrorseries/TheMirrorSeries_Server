@@ -30,12 +30,12 @@ func NewMatch(c, start, end int32, msg []byte, _client net.Conn) *Match {
 func (match *Match) ReveiveMessage() {
 	log.Println(match.command)
 	switch match.command {
-	case 0:
+	case int32(DTO.MatchTypes_ENTER_CREQ):
 		//申请进入匹配
 		log.Println("start match")
 		match.matchStart()
 		break
-	case 2:
+	case int32(DTO.MatchTypes_LEAVE_CREQ):
 		//申请离开匹配
 		log.Println("live match")
 		match.matchEnd()

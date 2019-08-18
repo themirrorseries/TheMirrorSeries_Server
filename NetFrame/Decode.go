@@ -16,9 +16,9 @@ type Decode struct{
 func (dec *Decode)Read(head []byte){
 	dec.ReadPos = 0;
 	binary.Read(bytes.NewBuffer(head[dec.ReadPos:]), binary.LittleEndian, &dec.Len)
-	dec.ReadPos += 4
+	dec.ReadPos += int32(binary.Size(dec.Len))
 	binary.Read(bytes.NewBuffer(head[dec.ReadPos:]), binary.LittleEndian, &dec.Thetype)
-	dec.ReadPos += 4
+	dec.ReadPos += int32(binary.Size(dec.Thetype))
 	binary.Read(bytes.NewBuffer(head[dec.ReadPos:]), binary.LittleEndian, &dec.Command)
-	dec.ReadPos += 4
+	dec.ReadPos += int32(binary.Size(dec.Command))
 }

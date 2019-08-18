@@ -96,7 +96,7 @@ func (room *Room) InsertPlayer(playerID int32, playerRole int32, client net.Conn
 		RoomMng[NextRoomID-1].RoomInform()
 		//go RoomMng[NextRoomID-1].RoomRun()
 	} else {
-		room.RoomMatchInform(1, client)
+		room.RoomMatchInform(int32(DTO.MatchTypes_ENTER_SRES), client)
 	}
 	RoomCacheMu.Unlock()
 }
@@ -111,7 +111,7 @@ func (room *Room) RemovePlayer(playerid int32, client net.Conn) {
 		}
 	}
 	room.playernum--
-	RoomCache.RoomMatchInform(3, client)
+	RoomCache.RoomMatchInform(int32(DTO.MatchTypes_LEAVE_SRES), client)
 	RoomCacheMu.Unlock()
 }
 
@@ -120,7 +120,7 @@ func (room *Room) RoomMatchInform(command int32, client net.Conn) {
 	any := DTO.MatchRtnDTO{}
 	any.Cacheroomid = 1
 	data, _ := proto.Marshal(&any)
-	encode := NetFrame.NewEncode(int32(8+any.XXX_Size()), 2, 3)
+	encode := NetFrame.NewEncode(int32(8+any.XXX_Size()), int32(DTO.MsgTypes_TYPE_MATCH), command)
 	encode.Write()
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())
@@ -152,7 +152,7 @@ func (room *Room) RoomInform() {
 		match.Players[i].Seat = int32(i + 1)
 	}
 	data, _ := proto.Marshal(&match)
-	encode := NetFrame.NewEncode(int32(8+match.XXX_Size()), 2, 4)
+	encode := NetFrame.NewEncode(int32(8+match.XXX_Size()), int32(DTO.MsgTypes_TYPE_MATCH), int32(DTO.MatchTypes_ENTER_SELECT_BRO))
 	encode.Write()
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())
@@ -186,7 +186,7 @@ func (room *Room) RoomBroad() {
 	}
 	//把要广播的内容写成字节流
 	data, _ := proto.Marshal(&send)
-	encode := NetFrame.NewEncode(int32(8+send.XXX_Size()), 3, 2)
+	encode := NetFrame.NewEncode(int32(8+send.XXX_Size()), int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES))
 	encode.Write()
 	var buffer bytes.Buffer
 	buffer.Write(encode.GetBytes())

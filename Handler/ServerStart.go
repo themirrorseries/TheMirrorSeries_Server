@@ -9,18 +9,21 @@ import (
 func recvMessage(client net.Conn) error {
 	var message []byte
 	message = make([]byte, 1024)
+	//var err error=!nil
 
 	for {
+		log.Error("开始读数据")
+		len, err := client.Read(message)
+		log.Error("读数据完成")
 		//todo it doesn't work, unless we add heart bag
-		if client == nil {
+		if err != nil {
 			//return client.Close()
 			log.Error("client out", client.Close())
 			break
 		}
-		len, _ := client.Read(message)
 		if len > 0 {
 			//log.Println(string(message[0:len]))
-			DeSerizalize(message[0:len], client)
+			Handler(message[0:len], client)
 		}
 	}
 	return nil

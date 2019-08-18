@@ -32,7 +32,7 @@ func (enc *Encode) WriteInt32(num int32) {
 	buff := bytes.NewBuffer([]byte{})
 	binary.Write(buff, binary.LittleEndian, num)
 	copy(enc.head[enc.writePos:], buff.Bytes())
-	enc.writePos += 4
+	enc.writePos += int32(binary.Size(num))
 }
 
 func (enc *Encode) Write() {

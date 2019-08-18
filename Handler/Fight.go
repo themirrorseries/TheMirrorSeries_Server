@@ -29,7 +29,7 @@ func NewFight(c, start, end int32, msg []byte, _client net.Conn) *Fight {
 
 func (fight *Fight) ReveiveMessage() {
 	switch fight.command {
-	case 0:
+	case int32(DTO.FightTypes_MOVE_CREQ):
 		//client move
 		fight.move()
 	}
