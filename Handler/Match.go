@@ -5,7 +5,6 @@ import (
 	"../proto/dto"
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
-	"net"
 )
 
 type Match struct {
@@ -13,10 +12,10 @@ type Match struct {
 	messages   []byte
 	bytesStart int32
 	bytesEnd   int32
-	client     net.Conn
+	client     *Global.ClientState
 }
 
-func NewMatch(c, start, end int32, msg []byte, _client net.Conn) *Match {
+func NewMatch(c, start, end int32, msg []byte, _client *Global.ClientState) *Match {
 	match := &Match{
 		command:    c,
 		bytesStart: start,
@@ -46,20 +45,19 @@ func (match *Match) ReveiveMessage() {
 	}
 }
 func (match *Match) matchStart() {
-	//to do
 	log.Println("match start")
-	//add to match pool
-	//匹配也用anyDTO
+	match.client.IsMatch = true
 	any := DTO.MatchDTO{}
 	proto.Unmarshal(match.messages[match.bytesStart:match.bytesEnd], &any)
+	match.client.PlayerID = any.Id
 	Global.RoomCache.InsertPlayer(any.Id, any.RoleID, match.client)
 }
 
 func (match *Match) matchEnd() {
-	//to do
+
 	log.Println("match end")
-	//delete from cache room
+	match.client.IsMatch = false
 	any := DTO.MatchRtnDTO{}
 	proto.Unmarshal(match.messages[match.bytesStart:match.bytesEnd], &any)
-	Global.RoomCache.RemovePlayer(any.Id, match.client)
+	Global.RoomCache.RemovePlayer(any.Id, match.client.Client)
 }

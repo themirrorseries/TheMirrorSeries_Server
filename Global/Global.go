@@ -2,6 +2,7 @@ package Global
 
 import (
 	"gopkg.in/mgo.v2"
+	"net"
 	"sync"
 	"time"
 )
@@ -16,6 +17,7 @@ var NextUserID int32
 var NextUserIDMu sync.Mutex
 var RoomCollection *mgo.Collection
 var UserCollection *mgo.Collection
+var ClientMap map[net.Conn]ClientState
 
 const RoomPeople int32 = 2
 const FramesPerBag int32 = 3

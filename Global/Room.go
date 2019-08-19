@@ -15,8 +15,10 @@ import (
 type PlayerList struct {
 	PlayerID     int32
 	Name         string
-	PlayerClient net.Conn
+	PlayerClient *ClientState
 	PlayerRole   int32
+	IsLive       bool
+	IsDead       bool
 }
 
 type Room struct {
@@ -28,16 +30,18 @@ type Room struct {
 	CacheMsgIndex   int32
 	CacheMsgIndexMu sync.Mutex
 	StartTime       time.Time //用于计算两次广播之间的最长等待时间
+	RoomLivePeople  int32
 }
 
 func NewRoom() *Room {
 	room := &Room{
-		roomid:        0,
-		isfull:        false,
-		playernum:     0,
-		players:       make([]PlayerList, RoomPeople),
-		CacheMsg:      make([]DTO.ClientMoveDTO, RoomPeople),
-		CacheMsgIndex: 0,
+		roomid:         0,
+		isfull:         false,
+		playernum:      0,
+		players:        make([]PlayerList, RoomPeople),
+		CacheMsg:       make([]DTO.ClientMoveDTO, RoomPeople),
+		CacheMsgIndex:  0,
+		RoomLivePeople: RoomPeople,
 	}
 	return room
 }
@@ -71,7 +75,7 @@ func (room *Room) RoomRun() {
 }
 
 //cache room调用
-func (room *Room) InsertPlayer(playerID int32, playerRole int32, client net.Conn) {
+func (room *Room) InsertPlayer(playerID int32, playerRole int32, client *ClientState) {
 	//roomFull
 	RoomCacheMu.Lock()
 	if !room.isfull {
@@ -80,12 +84,13 @@ func (room *Room) InsertPlayer(playerID int32, playerRole int32, client net.Conn
 				room.players[i].PlayerID = playerID
 				room.players[i].PlayerRole = playerRole
 				room.players[i].PlayerClient = client
+				room.players[i].IsLive = false
+				room.players[i].IsDead = false
+				room.playernum++
 				break
 			}
 		}
 	}
-	room.playernum++
-
 	if room.playernum == RoomPeople {
 		RoomCache.roomid = NextRoomID
 		RoomMng[NextRoomID] = NewRoom()
@@ -96,7 +101,7 @@ func (room *Room) InsertPlayer(playerID int32, playerRole int32, client net.Conn
 		RoomMng[NextRoomID-1].RoomInform()
 		//go RoomMng[NextRoomID-1].RoomRun()
 	} else {
-		room.RoomMatchInform(int32(DTO.MatchTypes_ENTER_SRES), client)
+		room.RoomMatchInform(int32(DTO.MatchTypes_ENTER_SRES), client.Client)
 	}
 	RoomCacheMu.Unlock()
 }
@@ -107,10 +112,10 @@ func (room *Room) RemovePlayer(playerid int32, client net.Conn) {
 	for i := int32(0); i < RoomPeople; i++ {
 		if room.players[i].PlayerID == playerid {
 			room.players[i].PlayerID = -1
+			room.playernum--
 			break
 		}
 	}
-	room.playernum--
 	RoomCache.RoomMatchInform(int32(DTO.MatchTypes_LEAVE_SRES), client)
 	RoomCacheMu.Unlock()
 }
@@ -133,7 +138,6 @@ func (room *Room) RoomInform() {
 
 	match := DTO.MatchSuccessDTO{}
 	match.Roomid = room.roomid
-
 	// 暂时写死,后期读表
 	match.Speed = 10
 	match.Count = 20
@@ -149,7 +153,11 @@ func (room *Room) RoomInform() {
 		match.Players[i].Playerid = room.players[i].PlayerID
 		match.Players[i].Name = room.players[i].Name
 		match.Players[i].Roleid = room.players[i].PlayerRole
-		match.Players[i].Seat = int32(i + 1)
+		match.Players[i].Seat = i + 1
+		room.players[i].PlayerClient.IsMatch = false
+		room.players[i].PlayerClient.IsFight = true
+		room.players[i].PlayerClient.RoomSeat = i + 1
+		room.players[i].PlayerClient.RoomID = room.roomid
 	}
 	data, _ := proto.Marshal(&match)
 	encode := NetFrame.NewEncode(int32(8+match.XXX_Size()), int32(DTO.MsgTypes_TYPE_MATCH), int32(DTO.MatchTypes_ENTER_SELECT_BRO))
@@ -158,7 +166,7 @@ func (room *Room) RoomInform() {
 	buffer.Write(encode.GetBytes())
 	buffer.Write(data)
 	for i := int32(0); i < RoomPeople; i++ {
-		room.players[i].PlayerClient.Write(buffer.Bytes())
+		room.players[i].PlayerClient.Client.Write(buffer.Bytes())
 	}
 	log.Println("inform ok")
 
@@ -193,7 +201,9 @@ func (room *Room) RoomBroad() {
 	buffer.Write(data)
 
 	for i := int32(0); i < RoomPeople; i++ {
-		room.players[i].PlayerClient.Write(buffer.Bytes())
+		if !room.players[i].IsLive {
+			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
+		}
 	}
 
 	//把广播的若干帧存入数据库，有可能碰到房间数据库未创建完毕就开始插入数据了
@@ -212,7 +222,7 @@ func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
 	}
 	room.CacheMsg[room.CacheMsgIndex] = *move
 	room.CacheMsgIndex++
-	if room.CacheMsgIndex == RoomPeople || time.Since(room.StartTime) >= time.Duration(time.Millisecond*WaitMS) {
+	if room.CacheMsgIndex == room.RoomLivePeople || time.Since(room.StartTime) >= time.Duration(time.Millisecond*WaitMS) {
 		room.RoomBroad()
 	}
 	room.CacheMsgIndexMu.Unlock()

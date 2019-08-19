@@ -16,13 +16,13 @@ type Fight struct {
 	client     net.Conn
 }
 
-func NewFight(c, start, end int32, msg []byte, _client net.Conn) *Fight {
+func NewFight(c, start, end int32, msg []byte, _client *Global.ClientState) *Fight {
 	fight := &Fight{
 		command:    c,
 		bytesStart: start,
 		bytesEnd:   end,
 		messages:   msg,
-		client:     _client,
+		client:     _client.Client,
 	}
 	return fight
 }

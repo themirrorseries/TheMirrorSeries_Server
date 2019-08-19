@@ -18,13 +18,13 @@ type Login struct {
 	client     net.Conn
 }
 
-func NewLogin(c, start, end int32, msg []byte, _client net.Conn) *Login {
+func NewLogin(c, start, end int32, msg []byte, _client *Global.ClientState) *Login {
 	login := &Login{
 		command:    c,
 		bytesStart: start,
 		bytesEnd:   end,
 		messages:   msg,
-		client:     _client,
+		client:     _client.Client,
 	}
 	return login
 }

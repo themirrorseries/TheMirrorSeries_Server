@@ -1,12 +1,12 @@
 package Handler
 
 import (
+	"../Global"
 	"../NetFrame"
 	"../proto/dto"
-	"net"
 )
 
-func Handler(msg []byte, client net.Conn) {
+func Handler(msg []byte, client *Global.ClientState) {
 	var decode NetFrame.Decode
 	decode.Read(msg)
 
