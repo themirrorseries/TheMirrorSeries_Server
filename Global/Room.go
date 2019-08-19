@@ -212,7 +212,7 @@ func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
 	}
 	room.CacheMsg[room.CacheMsgIndex] = *move
 	room.CacheMsgIndex++
-	if room.CacheMsgIndex == RoomPeople || time.Since(room.StartTime) >= time.Duration(time.Millisecond*9) {
+	if room.CacheMsgIndex == RoomPeople || time.Since(room.StartTime) >= time.Duration(time.Millisecond*WaitMS) {
 		room.RoomBroad()
 	}
 	room.CacheMsgIndexMu.Unlock()

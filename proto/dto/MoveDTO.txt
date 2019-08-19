@@ -4,15 +4,14 @@ message DeltaDirection
 {
 	float x=1;
 	float y=2;
-	float deltaTime=3;
 }
 
 message FrameInfo
 {
 		int32 Frame=1;
 		DeltaDirection Move=2;
-		int32 Skillid=3;
-		DeltaDirection SkillDir=4;
+		float deltaTime=3;
+		int32 Skillid=4;
 }
 
 message ClientMoveDTO

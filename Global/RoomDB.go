@@ -54,7 +54,7 @@ func AddFrame(c *mgo.Collection, roomid int32, send *DTO.ServerMoveDTO) {
 		for j := int32(0); j < FramesPerBag; j++ {
 			//广播的数据有时候会没有移动或者没有方向，此时地址会出错
 			roomFrames[i*FramesPerBag+j] = Frame{GetDeltaDirection(send.ClientInfo[i].Msg[j].Move),
-				GetDeltaDirection(send.ClientInfo[i].Msg[j].SkillDir),
+				send.ClientInfo[i].Msg[j].DeltaTime,
 				send.ClientInfo[i].Msg[j].Skillid}
 		}
 	}
@@ -73,8 +73,8 @@ func GetFrame() {
 //广播的数据有时候会没有移动或者没有方向，此时是nil
 func GetDeltaDirection(deltaDirection *DTO.DeltaDirection) DeltaDirection {
 	if deltaDirection == nil {
-		return DeltaDirection{0, 0, 0}
+		return DeltaDirection{0, 0}
 	} else {
-		return DeltaDirection{deltaDirection.X, deltaDirection.Y, deltaDirection.DeltaTime}
+		return DeltaDirection{deltaDirection.X, deltaDirection.Y}
 	}
 }

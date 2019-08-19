@@ -3,6 +3,7 @@ package Global
 import (
 	"gopkg.in/mgo.v2"
 	"sync"
+	"time"
 )
 
 var RoomCache Room          //cache满的时候新建一个room,将cache信息拷贝过去放进RoomMng字典中，清空cache room
@@ -18,3 +19,4 @@ var UserCollection *mgo.Collection
 
 const RoomPeople int32 = 2
 const FramesPerBag int32 = 3
+const WaitMS time.Duration = 9

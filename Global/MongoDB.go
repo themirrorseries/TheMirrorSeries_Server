@@ -31,13 +31,12 @@ type Player struct {
 }
 
 type Frame struct {
-	FrameMove    DeltaDirection
-	FrameSkill   DeltaDirection
-	FrameSkillID int32
+	FrameMove      DeltaDirection
+	FrameDeltaTime float32
+	FrameSkillID   int32
 }
 
 type DeltaDirection struct {
-	X         float32
-	Y         float32
-	Deltatime float32
+	X float32
+	Y float32
 }

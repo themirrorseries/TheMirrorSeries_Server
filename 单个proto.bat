@@ -1,2 +1,2 @@
-protoc ./proto/dto/MatchRtnDTO.txt --go_out=./
-protoc ./proto/dto/MatchRtnDTO.txt --csharp_out=./
+protoc ./proto/dto/MoveDTO.txt --go_out=./
+protoc ./proto/dto/MoveDTO.txt --csharp_out=./
