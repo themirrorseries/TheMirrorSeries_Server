@@ -5,30 +5,14 @@ import (
 	"../proto/dto"
 	"github.com/golang/protobuf/proto"
 	//log "github.com/sirupsen/logrus"
-	"net"
 )
 
 type Fight struct {
-	command    int32
-	messages   []byte
-	bytesStart int32
-	bytesEnd   int32
-	client     net.Conn
+	data *HandlerData
 }
 
-func NewFight(c, start, end int32, msg []byte, _client *Global.ClientState) *Fight {
-	fight := &Fight{
-		command:    c,
-		bytesStart: start,
-		bytesEnd:   end,
-		messages:   msg,
-		client:     _client.Client,
-	}
-	return fight
-}
-
-func (fight *Fight) ReveiveMessage() {
-	switch fight.command {
+func (fight *Fight) ReceiveMessage() {
+	switch fight.data.command {
 	case int32(DTO.FightTypes_MOVE_CREQ):
 		//client move
 		fight.move()
@@ -38,7 +22,7 @@ func (fight *Fight) ReveiveMessage() {
 func (fight *Fight) move() {
 
 	move := DTO.ClientMoveDTO{}
-	proto.Unmarshal(fight.messages[fight.bytesStart:fight.bytesEnd], &move)
+	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &move)
 
 	Global.RoomMng[move.Roomid].InsertMsg(&move)
 }

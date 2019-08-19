@@ -6,17 +6,39 @@ import (
 	"../proto/dto"
 )
 
+type HandlerData struct {
+	command    int32
+	messages   []byte
+	bytesStart int32
+	bytesEnd   int32
+	client     *Global.ClientState
+}
+type HandlerFunc interface {
+	ReceiveMessage()
+}
+
+func NewHandlerData(decode *NetFrame.Decode, msg []byte, _client *Global.ClientState) *HandlerData {
+	handlerData := &HandlerData{
+		command:    decode.Command,
+		bytesStart: decode.ReadPos,
+		bytesEnd:   decode.Len + 4,
+		messages:   msg,
+		client:     _client,
+	}
+	return handlerData
+}
+
 func Handler(msg []byte, client *Global.ClientState) {
 	var decode NetFrame.Decode
 	decode.Read(msg)
-
+	handlerData := NewHandlerData(&decode, msg, client)
+	var p HandlerFunc
 	//HANDLER CENTER
 	switch decode.Thetype {
 	case int32(DTO.MsgTypes_TYPE_LOGIN):
 		{
-			login := NewLogin(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
-			login.ReveiveMessage()
-			//return login
+			p = &Login{handlerData}
+			p.ReceiveMessage()
 		}
 		break
 
@@ -24,16 +46,16 @@ func Handler(msg []byte, client *Global.ClientState) {
 		//user
 		break
 	case int32(DTO.MsgTypes_TYPE_MATCH):
-		//match
-		match := NewMatch(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
-		match.ReveiveMessage()
+		{
+			p = &Match{handlerData}
+			p.ReceiveMessage()
+		}
 		break
 	case int32(DTO.MsgTypes_TYPE_FIGHT):
-		//fight
-		//roomManager()
-		//Global.ChanMap[decode.Command] <- msg
-		fight := NewFight(decode.Command, decode.ReadPos, decode.Len+4, msg, client)
-		fight.ReveiveMessage()
+		{
+			p = &Fight{handlerData}
+			p.ReceiveMessage()
+		}
 		break
 	default:
 		break

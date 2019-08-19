@@ -4,7 +4,6 @@ import (
 	"../NetFrame"
 	"../Tools"
 	"../proto/dto"
-	"bytes"
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
 	"net"
@@ -125,12 +124,7 @@ func (room *Room) RoomMatchInform(command int32, client net.Conn) {
 	any := DTO.MatchRtnDTO{}
 	any.Cacheroomid = 1
 	data, _ := proto.Marshal(&any)
-	encode := NetFrame.NewEncode(int32(8+any.XXX_Size()), int32(DTO.MsgTypes_TYPE_MATCH), command)
-	encode.Write()
-	var buffer bytes.Buffer
-	buffer.Write(encode.GetBytes())
-	buffer.Write(data)
-
+	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_MATCH), command, data, any.XXX_Size())
 	client.Write(buffer.Bytes())
 }
 
@@ -160,11 +154,7 @@ func (room *Room) RoomInform() {
 		room.players[i].PlayerClient.RoomID = room.roomid
 	}
 	data, _ := proto.Marshal(&match)
-	encode := NetFrame.NewEncode(int32(8+match.XXX_Size()), int32(DTO.MsgTypes_TYPE_MATCH), int32(DTO.MatchTypes_ENTER_SELECT_BRO))
-	encode.Write()
-	var buffer bytes.Buffer
-	buffer.Write(encode.GetBytes())
-	buffer.Write(data)
+	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_MATCH), int32(DTO.MatchTypes_ENTER_SELECT_BRO), data, match.XXX_Size())
 	for i := int32(0); i < RoomPeople; i++ {
 		room.players[i].PlayerClient.Client.Write(buffer.Bytes())
 	}
@@ -194,11 +184,7 @@ func (room *Room) RoomBroad() {
 	}
 	//把要广播的内容写成字节流
 	data, _ := proto.Marshal(&send)
-	encode := NetFrame.NewEncode(int32(8+send.XXX_Size()), int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES))
-	encode.Write()
-	var buffer bytes.Buffer
-	buffer.Write(encode.GetBytes())
-	buffer.Write(data)
+	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, send.XXX_Size())
 
 	for i := int32(0); i < RoomPeople; i++ {
 		if !room.players[i].IsLive {

@@ -45,3 +45,12 @@ func (enc *Encode) Write() {
 func (enc *Encode) GetBytes() (head []byte) {
 	return enc.head
 }
+
+func WriteMessage(thetype int32, command int32, message []byte, messageLen int) *bytes.Buffer {
+	encode := NewEncode(int32(8+messageLen), thetype, command)
+	encode.Write()
+	var buffer bytes.Buffer
+	buffer.Write(encode.GetBytes())
+	buffer.Write(message)
+	return &buffer
+}
