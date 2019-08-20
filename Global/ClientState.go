@@ -27,6 +27,5 @@ func (c *ClientState) MatchOut() {
 }
 
 func (c *ClientState) FightOut() {
-	RoomMng[c.RoomID].players[c.RoomSeat-1].IsLive = true
-	RoomMng[c.RoomID].RoomLivePeople--
+	RoomMng[c.RoomID].PlayerLeave(c.RoomSeat)
 }

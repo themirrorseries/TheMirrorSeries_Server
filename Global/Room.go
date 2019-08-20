@@ -16,7 +16,7 @@ type PlayerList struct {
 	Name         string
 	PlayerClient *ClientState
 	PlayerRole   int32
-	IsLive       bool
+	IsLeave      bool
 	IsDead       bool
 }
 
@@ -29,7 +29,7 @@ type Room struct {
 	CacheMsgIndex   int32
 	CacheMsgIndexMu sync.Mutex
 	StartTime       time.Time //用于计算两次广播之间的最长等待时间
-	RoomLivePeople  int32
+	RoomLivePeople  int32     //房间存活人数
 }
 
 func NewRoom() *Room {
@@ -84,7 +84,7 @@ func (room *Room) InsertPlayer(playerID int32, playerRole int32, playername stri
 				room.players[i].PlayerRole = playerRole
 				room.players[i].PlayerClient = client
 				room.players[i].Name = playername
-				room.players[i].IsLive = false
+				room.players[i].IsLeave = false
 				room.players[i].IsDead = false
 				room.playernum++
 				break
@@ -188,7 +188,7 @@ func (room *Room) RoomBroad() {
 	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, send.XXX_Size())
 
 	for i := int32(0); i < RoomPeople; i++ {
-		if !room.players[i].IsLive {
+		if !room.players[i].IsLeave {
 			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
 		}
 	}
@@ -220,4 +220,25 @@ func (room *Room) ClearCacheMsg() {
 		room.CacheMsg[i].Seat = -1
 	}
 	room.CacheMsgIndex = 0
+}
+
+//死亡——接受消息少接受一个
+func (room *Room) PlayerDeath(seat int32) {
+	room.players[seat-1].IsDead = true
+	room.RoomLivePeople--
+}
+
+//离开——发送消息少发送一个
+//可能的组合  先死亡再离开——先少发送 再少接受		未死亡离开=客户端异常离开 同时少发送和接收
+func (room *Room) PlayerLeave(seat int32) {
+	room.players[seat-1].IsLeave = true
+	room.players[seat-1].PlayerClient.IsFight = false
+	if !room.players[seat-1].IsDead {
+		room.RoomLivePeople--
+	}
+	log.Println("leave")
+	room.playernum--
+	if room.playernum == 0 {
+		delete(RoomMng, room.roomid) //清除map，实际内存释放通过GC
+	}
 }
