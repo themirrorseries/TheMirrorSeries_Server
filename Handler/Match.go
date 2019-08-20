@@ -34,7 +34,7 @@ func (match *Match) matchStart() {
 	any := DTO.MatchDTO{}
 	proto.Unmarshal(match.data.messages[match.data.bytesStart:match.data.bytesEnd], &any)
 	match.data.client.PlayerID = any.Id
-	Global.RoomCache.InsertPlayer(any.Id, any.RoleID, match.data.client)
+	Global.RoomCache.InsertPlayer(any.Id, any.RoleID, any.Name, match.data.client)
 }
 
 func (match *Match) matchEnd() {

@@ -74,7 +74,7 @@ func (room *Room) RoomRun() {
 }
 
 //cache room调用
-func (room *Room) InsertPlayer(playerID int32, playerRole int32, client *ClientState) {
+func (room *Room) InsertPlayer(playerID int32, playerRole int32, playername string, client *ClientState) {
 	//roomFull
 	RoomCacheMu.Lock()
 	if !room.isfull {
@@ -83,6 +83,7 @@ func (room *Room) InsertPlayer(playerID int32, playerRole int32, client *ClientS
 				room.players[i].PlayerID = playerID
 				room.players[i].PlayerRole = playerRole
 				room.players[i].PlayerClient = client
+				room.players[i].Name = playername
 				room.players[i].IsLive = false
 				room.players[i].IsDead = false
 				room.playernum++
