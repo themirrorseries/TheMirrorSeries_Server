@@ -19,7 +19,7 @@ var RoomCollection *mgo.Collection
 var UserCollection *mgo.Collection
 var ClientMap map[net.Conn]ClientState
 
-const RoomPeople int32 = 1
+const RoomPeople int32 = 4
 const FramesPerBag int32 = 3
-const WaitMS time.Duration = 9
+const WaitMS time.Duration = 30
 const DetailedLog string = "/Logs/"
