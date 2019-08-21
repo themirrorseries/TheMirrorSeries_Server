@@ -180,6 +180,7 @@ func (room *Room) RoomBroad() {
 			send.ClientInfo[i].Seat = room.CacheMsg[i].Seat
 			send.ClientInfo[i].Msg = room.CacheMsg[i].Msg
 		} else {
+			send.ClientInfo[i].Seat = -1
 			break
 		}
 	}
