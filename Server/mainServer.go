@@ -3,7 +3,7 @@ package main
 import (
 	"../Global"
 	"../Handler"
-	"fmt"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -19,7 +19,9 @@ func main() {
 	Global.NextUserID = 100000
 	//Global.NextRoomID = Global.GetLastRoomID(Global.RoomCollection) //房间ID从1开始
 	//Global.NextUserID = Global.GetLastUserID(Global.UserCollection) //用户ID从10万开始
-	fmt.Println(Global.NextRoomID, Global.NextUserID)
 
+	//初始化日志信息
+	Global.DetailedLog.Log = Global.InitLog(logrus.InfoLevel, Global.DetailedLogPath)
+	Global.ErrorLog.Log = Global.InitLog(logrus.ErrorLevel, Global.ErrorLogPath)
 	Handler.Start()
 }

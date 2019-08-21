@@ -19,9 +19,11 @@ func recvMessage(client net.Conn) error {
 			//客户端断开处理	匹配中 房间中
 			if clientState.IsMatch {
 				clientState.MatchOut()
+				Global.DetailedLog.Warn(clientState.PlayerID, Global.Client_OUT_Matching)
 			}
 			if clientState.IsFight {
 				clientState.FightOut()
+				Global.DetailedLog.Warn(clientState.PlayerID, Global.Client_OUT_Fighting)
 			}
 			log.Error("client out", client.Close())
 			break
@@ -37,19 +39,21 @@ func recvMessage(client net.Conn) error {
 func Start() {
 	server, err := net.Listen("tcp", "0.0.0.0:9700")
 	if err != nil {
-		log.Fatal("start server failed!\n")
+		Global.ErrorLog.Log.Errorln("start server failed!\n")
 		os.Exit(1)
 	}
 	defer server.Close()
 	log.Println("server is running...")
+	Global.DetailedLog.Log.Info("服务端开启...")
 	for {
 		client, err := server.Accept()
 		if err != nil {
-			log.Fatal("Accept error\n")
+			Global.ErrorLog.Log.Errorln("Accept error\n")
 			continue
 		}
 
 		log.Println("the client is connectted...")
+		Global.DetailedLog.Log.Info("一个新的客户端连接...")
 		go recvMessage(client)
 	}
 }

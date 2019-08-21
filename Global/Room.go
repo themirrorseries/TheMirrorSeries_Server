@@ -158,6 +158,7 @@ func (room *Room) RoomInform() {
 	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_MATCH), int32(DTO.MatchTypes_ENTER_SELECT_BRO), data, match.XXX_Size())
 	for i := int32(0); i < RoomPeople; i++ {
 		room.players[i].PlayerClient.Client.Write(buffer.Bytes())
+		DetailedLog.Detailed(room.players[i].PlayerID, Fight_IN)
 	}
 	log.Println("inform ok")
 
@@ -223,14 +224,11 @@ func (room *Room) ClearCacheMsg() {
 	room.CacheMsgIndex = 0
 }
 
-//死亡——接受消息少接受一个
 func (room *Room) PlayerDeath(seat int32) {
 	room.players[seat-1].IsDead = true
 	room.RoomLivePeople--
 }
 
-//离开——发送消息少发送一个
-//可能的组合  先死亡再离开——先少发送 再少接受		未死亡离开=客户端异常离开 同时少发送和接收
 func (room *Room) PlayerLeave(seat int32) {
 	room.players[seat-1].IsLeave = true
 	room.players[seat-1].PlayerClient.IsFight = false
