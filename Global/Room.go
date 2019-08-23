@@ -31,7 +31,10 @@ type Room struct {
 	StartTime       time.Time //用于计算两次广播之间的最长等待时间
 	RoomLivePeople  int32     //房间存活人数
 	timer           *time.Timer
-	RoomChan        chan *DTO.ServerMoveDTO
+	loadUp          []int32
+	loadUpNum       int32
+	loadUpMu        sync.Mutex
+	//RoomChan        chan *DTO.ServerMoveDTO
 }
 
 func NewRoom() *Room {
@@ -121,7 +124,11 @@ func (room *Room) RoomMatchInform(command int32, client net.Conn) {
 
 //初始化房间数据
 func (room *Room) RoomInform() {
-
+	room.loadUpNum = 0
+	room.loadUp = make([]int32, RoomPeople)
+	for i := int32(0); i < RoomPeople; i++ {
+		room.loadUp[i] = -1
+	}
 	match := DTO.MatchSuccessDTO{}
 	match.Roomid = room.roomid
 	// 暂时写死,后期读表
@@ -153,10 +160,10 @@ func (room *Room) RoomInform() {
 	}
 	log.Println("inform ok")
 
-	room.RoomChan = make(chan *DTO.ServerMoveDTO, 100000)
+	//room.RoomChan = make(chan *DTO.ServerMoveDTO, 100000)
 	//把新开的房间信息存入数据库
-	AddRoom(RoomCollection, room.roomid, &match)
-	go AddFrame(RoomCollection, room.roomid, room.RoomChan)
+	//AddRoom(RoomCollection, room.roomid, &match)
+	//go AddFrame(RoomCollection, room.roomid, room.RoomChan)
 }
 
 func (room *Room) RoomBroad() {
@@ -191,7 +198,7 @@ func (room *Room) RoomBroad() {
 
 	//把广播的若干帧存入数据库，有可能碰到房间数据库未创建完毕就开始插入数据了
 	//AddFrame(RoomCollection, room.roomid, &send)
-	room.RoomChan <- &send
+	//room.RoomChan <- &send
 	//广播完后重置缓存消息和时间
 	room.ClearCacheMsg()
 }
@@ -201,7 +208,6 @@ func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
 	room.CacheMsgIndexMu.Lock()
 
 	if room.CacheMsgIndex == 0 {
-		room.StartTime = time.Now()
 		room.timer = time.NewTimer(WaitMS * time.Millisecond)
 		go func() {
 			select {
@@ -214,8 +220,8 @@ func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
 	room.CacheMsgIndex++
 
 	if room.CacheMsgIndex == room.RoomLivePeople {
-		room.RoomBroad()
 		room.timer.Stop()
+		room.RoomBroad()
 	}
 	room.CacheMsgIndexMu.Unlock()
 }
@@ -241,7 +247,23 @@ func (room *Room) PlayerLeave(seat int32) {
 	log.Println("leave")
 	room.playernum--
 	if room.playernum == 0 {
-		close(room.RoomChan)
+		//close(room.RoomChan)
 		delete(RoomMng, room.roomid) //清除map，实际内存释放通过GC
+	}
+}
+
+func (room *Room) AddLoadPeople(seat int32) {
+	room.loadUpMu.Lock()
+	if room.loadUp[seat-1] == -1 {
+		room.loadUp[seat-1] = 1
+		room.loadUpNum++
+	}
+	if room.loadUpNum == RoomPeople {
+		send := DTO.AnyDTO{}
+		data, _ := proto.Marshal(&send)
+		buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, send.XXX_Size())
+		for i := int32(0); i < RoomPeople; i++ {
+			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
+		}
 	}
 }

@@ -1,0 +1,6 @@
+syntax = "proto3";
+message FightLoadDTO
+{
+		int32 Roomid = 1;
+		int32 Seat = 2;
+}

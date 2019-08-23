@@ -1,2 +1,2 @@
-protoc ./proto/dto/FightLeaveDTO.txt --go_out=./
-protoc ./proto/dto/FightLeaveDTO.txt --csharp_out=./
+protoc ./proto/dto/FightLoadDTO.txt --go_out=./
+protoc ./proto/dto/FightLoadDTO.txt --csharp_out=./

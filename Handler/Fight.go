@@ -17,13 +17,16 @@ func (fight *Fight) ReceiveMessage() {
 		//client move
 		fight.move()
 		break
-	case 3: //客户端离开
+	case int32(DTO.FightTypes_LIVEROOM_CREQ): //客户端离开
 		fight.leaveRoom()
 		break
-	case 4: //客户端死亡
+	case int32(DTO.FightTypes_DEATH_CREQ): //客户端死亡
 		fight.death()
 		break
-	case 5: //客户端胜利
+	case int32(DTO.FightTypes_WIN_CREQ): //客户端胜利
+		break
+	case int32(DTO.FightTypes_LOAD_UP_CREQ):
+		fight.loadUp()
 		break
 	default:
 		break
@@ -54,4 +57,9 @@ func (fight *Fight) leaveRoom() {
 
 func (fight *Fight) winGame() {
 	//房间号  游戏信息
+}
+func (fight *Fight) loadUp() {
+	load := DTO.FightLoadDTO{}
+	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &load)
+	Global.RoomMng[load.Roomid].AddLoadPeople(load.Seat)
 }
