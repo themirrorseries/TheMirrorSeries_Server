@@ -7,8 +7,9 @@ import (
 )
 
 func ConnecToUser() *mgo.Collection {
-	session, err := mgo.Dial("localhost:27017")
+	session, err := mgo.Dial(MongoURL)
 	if err != nil {
+		ErrorLog.Log.Errorln("User数据库连接出错！")
 		panic(err)
 	}
 	session.SetMode(mgo.Monotonic, true)
@@ -25,15 +26,12 @@ func GetUser(c *mgo.Collection, uuid string) int32 {
 		c.Insert(&MongoDBUser{NextUserID, uuid})
 		NextUserID++
 		NextUserIDMu.Unlock()
+		DetailedLog.Log.Info("该设备第一次连接，将为设备分配唯一用户ID---...", ret)
 		return ret
 	} else {
+		DetailedLog.Log.Info("已查询到该设备用户ID---...", user.Playerid)
 		return user.Playerid
 	}
-}
-
-func InsertUser(c *mgo.Collection) {
-	user := MongoDBUser{11110, "asda"}
-	c.Insert(&user)
 }
 
 //服务端启动的时候读取数据库最后一个UserID

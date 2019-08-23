@@ -30,17 +30,19 @@ func (login *Login) clientLogin() {
 	any := DTO.UserDTO{}
 	proto.Unmarshal(login.data.messages[login.data.bytesStart:login.data.bytesEnd], &any)
 	//数据库环境未搭建选此项
-	if !IsExist() {
-		Global.NextUserIDMu.Lock()
-		login.SendLoginMessage(Global.NextUserID)
-		Global.NextUserID++
-		Global.NextUserIDMu.Unlock()
-	} else {
-		login.SendLoginMessage(Global.NextUserID)
-	}
+	/*
+		if !IsExist() {
+			Global.NextUserIDMu.Lock()
+			login.SendLoginMessage(Global.NextUserID)
+			Global.NextUserID++
+			Global.NextUserIDMu.Unlock()
+		} else {
+			login.SendLoginMessage(Global.NextUserID)
+		}
+	*/
 
 	//已经有数据库环境选此项 屏蔽上面
-	//login.SendLoginMessage(Global.GetUser(Global.UserCollection, any.Uuid))
+	login.SendLoginMessage(Global.GetUser(Global.UserCollection, any.Uuid))
 }
 
 //检查设备号是否存在

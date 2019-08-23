@@ -30,6 +30,8 @@ type Room struct {
 	CacheMsgIndexMu sync.Mutex
 	StartTime       time.Time //用于计算两次广播之间的最长等待时间
 	RoomLivePeople  int32     //房间存活人数
+	timer           *time.Timer
+	RoomChan        chan *DTO.ServerMoveDTO
 }
 
 func NewRoom() *Room {
@@ -63,16 +65,6 @@ func (room *Room) CopyRoom(cacheRoom *Room) {
 	}
 }
 
-//游戏初始化  单独通知玩家所属座位编号	光线信息
-//其余群发通知	每隔t时间收集玩家操作 广播给所有房间内玩家
-//通知消息需要的数据	4个位置playerid	4个socket
-
-//多线程执行房间 not use now
-func (room *Room) RoomRun() {
-	//通知当前房间玩家匹配成功
-	room.RoomInform()
-}
-
 //cache room调用
 func (room *Room) InsertPlayer(playerID int32, playerRole int32, playername string, client *ClientState) {
 	//roomFull
@@ -95,11 +87,9 @@ func (room *Room) InsertPlayer(playerID int32, playerRole int32, playername stri
 		RoomCache.roomid = NextRoomID
 		RoomMng[NextRoomID] = NewRoom()
 		RoomMng[NextRoomID].CopyRoom(&RoomCache)
-		//ChanMap[NextRoomID] = make(chan []byte)
 		NextRoomID++
 		RoomCache.Clear()
 		RoomMng[NextRoomID-1].RoomInform()
-		//go RoomMng[NextRoomID-1].RoomRun()
 	} else {
 		room.RoomMatchInform(int32(DTO.MatchTypes_ENTER_SRES), client.Client)
 	}
@@ -129,6 +119,7 @@ func (room *Room) RoomMatchInform(command int32, client net.Conn) {
 	client.Write(buffer.Bytes())
 }
 
+//初始化房间数据
 func (room *Room) RoomInform() {
 
 	match := DTO.MatchSuccessDTO{}
@@ -162,9 +153,10 @@ func (room *Room) RoomInform() {
 	}
 	log.Println("inform ok")
 
+	room.RoomChan = make(chan *DTO.ServerMoveDTO, 10000)
 	//把新开的房间信息存入数据库
-	//AddRoom(RoomCollection, room.roomid, &match)
-	//room.RoomStartInit()
+	AddRoom(RoomCollection, room.roomid, &match)
+	go AddFrame(RoomCollection, room.roomid, room.RoomChan)
 }
 
 func (room *Room) RoomBroad() {
@@ -172,7 +164,6 @@ func (room *Room) RoomBroad() {
 	send.Bagid = room.CacheMsg[0].Bagid
 	//需要自己分配内存
 	TmpClientMoveDTO := make([]DTO.ClientDTO, RoomPeople)
-	//TmpFrameInfo := make([]DTO.FrameInfo, FramesPerBag)
 	send.ClientInfo = make([]*DTO.ClientDTO, RoomPeople)
 	for i := int32(0); i < RoomPeople; i++ {
 		send.ClientInfo[i] = &TmpClientMoveDTO[i]
@@ -197,22 +188,31 @@ func (room *Room) RoomBroad() {
 
 	//把广播的若干帧存入数据库，有可能碰到房间数据库未创建完毕就开始插入数据了
 	//AddFrame(RoomCollection, room.roomid, &send)
-
+	room.RoomChan <- &send
 	//广播完后重置缓存消息和时间
 	room.ClearCacheMsg()
-	//room.StartTime = time.Now()
 }
 
 //客户端发来一个包，当缓存中包的数量为RoomPeople或者距离上一次发送过了9毫秒 就广播一次
 func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
 	room.CacheMsgIndexMu.Lock()
+
 	if room.CacheMsgIndex == 0 {
 		room.StartTime = time.Now()
+		room.timer = time.NewTimer(WaitMS * time.Millisecond)
+		go func() {
+			select {
+			case <-room.timer.C:
+				room.RoomBroad()
+			}
+		}()
 	}
 	room.CacheMsg[room.CacheMsgIndex] = *move
 	room.CacheMsgIndex++
-	if room.CacheMsgIndex == room.RoomLivePeople || time.Since(room.StartTime) >= time.Duration(time.Millisecond*WaitMS) {
+
+	if room.CacheMsgIndex == room.RoomLivePeople {
 		room.RoomBroad()
+		room.timer.Stop()
 	}
 	room.CacheMsgIndexMu.Unlock()
 }

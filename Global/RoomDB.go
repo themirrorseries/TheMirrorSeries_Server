@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 func ConnecToRoom() *mgo.Collection {
-	session, err := mgo.Dial("localhost:27017")
+	session, err := mgo.Dial(MongoURL)
 	if err != nil {
+		ErrorLog.Log.Errorln("Room数据库连接出错！")
 		panic(err)
 	}
 	session.SetMode(mgo.Monotonic, true)
@@ -42,27 +44,45 @@ func AddRoom(c *mgo.Collection, roomid int32, match *DTO.MatchSuccessDTO) {
 	room := MongoDBRoom{players, []Frame{}}
 	roomMng := MongoDBRoomMng{"1", roomid, room}
 	c.Insert(&roomMng)
-	fmt.Println("add room ok")
+	DetailedLog.Log.Info("新建房间数据库，房间号为---", roomMng.RoomID)
 }
 
 //每次插入RoomPeople*FramesPerBag帧
-func AddFrame(c *mgo.Collection, roomid int32, send *DTO.ServerMoveDTO) {
-	roomFrames := make([]Frame, RoomPeople*FramesPerBag)
-	fmt.Println("start add frame ")
+func AddFrame(c *mgo.Collection, roomid int32, t chan *DTO.ServerMoveDTO) {
+	timer := time.NewTimer(WaitMS * time.Second)
+	flag := false
+	for {
+		timer = time.NewTimer(10 * time.Second)
+		go func() {
+			select {
+			case <-timer.C:
+				{
+					close(t)
+					flag = true
+					return
+				}
+			}
+		}()
+		send := <-t
+		timer.Stop()
+		roomFrames := make([]Frame, RoomPeople*FramesPerBag)
 
-	for i := int32(0); i < RoomPeople; i++ {
-		for j := int32(0); j < FramesPerBag; j++ {
-			//广播的数据有时候会没有移动或者没有方向，此时地址会出错
-			roomFrames[i*FramesPerBag+j] = Frame{GetDeltaDirection(send.ClientInfo[i].Msg[j].Move),
-				send.ClientInfo[i].Msg[j].DeltaTime,
-				send.ClientInfo[i].Msg[j].Skillid}
+		for i := int32(0); i < RoomPeople; i++ {
+			if send.ClientInfo[i].Seat == -1 {
+				break
+			}
+			for j := int32(0); j < FramesPerBag; j++ {
+				//广播的数据有时候会没有移动或者没有方向，此时地址会出错
+				roomFrames[i*FramesPerBag+j] = Frame{GetDeltaDirection(send.ClientInfo[i].Msg[j].Move),
+					send.ClientInfo[i].Msg[j].DeltaTime,
+					send.ClientInfo[i].Msg[j].Skillid}
+			}
+		}
+		str := "room.roomframes"
+		for i := int32(0); i < RoomPeople*FramesPerBag; i++ {
+			c.Update(bson.M{"roomid": roomid}, bson.M{"$push": bson.M{str: roomFrames[i]}})
 		}
 	}
-	str := "room.roomframes"
-	for i := int32(0); i < RoomPeople*FramesPerBag; i++ {
-		c.Update(bson.M{"roomid": roomid}, bson.M{"$push": bson.M{str: roomFrames[i]}})
-	}
-	fmt.Println("start add frame ok")
 }
 
 //todo 可以将存储的房间对战数据取出用于回放功能
