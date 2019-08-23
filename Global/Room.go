@@ -153,7 +153,7 @@ func (room *Room) RoomInform() {
 	}
 	log.Println("inform ok")
 
-	room.RoomChan = make(chan *DTO.ServerMoveDTO, 10000)
+	room.RoomChan = make(chan *DTO.ServerMoveDTO, 100000)
 	//把新开的房间信息存入数据库
 	AddRoom(RoomCollection, room.roomid, &match)
 	go AddFrame(RoomCollection, room.roomid, room.RoomChan)
@@ -165,17 +165,20 @@ func (room *Room) RoomBroad() {
 	//需要自己分配内存
 	TmpClientMoveDTO := make([]DTO.ClientDTO, RoomPeople)
 	send.ClientInfo = make([]*DTO.ClientDTO, RoomPeople)
+	num := int32(0)
 	for i := int32(0); i < RoomPeople; i++ {
 		send.ClientInfo[i] = &TmpClientMoveDTO[i]
 		send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, FramesPerBag)
 		if room.CacheMsg[i].Seat != -1 {
 			send.ClientInfo[i].Seat = room.CacheMsg[i].Seat
 			send.ClientInfo[i].Msg = room.CacheMsg[i].Msg
+			num++
 		} else {
 			send.ClientInfo[i].Seat = -1
 			break
 		}
 	}
+	//DetailedLog.Log.Info("本次包的数量：", num)
 	//把要广播的内容写成字节流
 	data, _ := proto.Marshal(&send)
 	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, send.XXX_Size())
@@ -238,6 +241,7 @@ func (room *Room) PlayerLeave(seat int32) {
 	log.Println("leave")
 	room.playernum--
 	if room.playernum == 0 {
+		close(room.RoomChan)
 		delete(RoomMng, room.roomid) //清除map，实际内存释放通过GC
 	}
 }

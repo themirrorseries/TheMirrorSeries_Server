@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"time"
 )
 
 func ConnecToRoom() *mgo.Collection {
@@ -49,24 +48,13 @@ func AddRoom(c *mgo.Collection, roomid int32, match *DTO.MatchSuccessDTO) {
 
 //每次插入RoomPeople*FramesPerBag帧
 func AddFrame(c *mgo.Collection, roomid int32, t chan *DTO.ServerMoveDTO) {
-	timer := time.NewTimer(WaitMS * time.Second)
-	flag := false
+	roomFrames := make([]Frame, RoomPeople*FramesPerBag)
+	str := "room.roomframes"
 	for {
-		timer = time.NewTimer(10 * time.Second)
-		go func() {
-			select {
-			case <-timer.C:
-				{
-					close(t)
-					flag = true
-					return
-				}
-			}
-		}()
-		send := <-t
-		timer.Stop()
-		roomFrames := make([]Frame, RoomPeople*FramesPerBag)
-
+		send, ok := <-t
+		if !ok {
+			return
+		}
 		for i := int32(0); i < RoomPeople; i++ {
 			if send.ClientInfo[i].Seat == -1 {
 				break
@@ -76,11 +64,8 @@ func AddFrame(c *mgo.Collection, roomid int32, t chan *DTO.ServerMoveDTO) {
 				roomFrames[i*FramesPerBag+j] = Frame{GetDeltaDirection(send.ClientInfo[i].Msg[j].Move),
 					send.ClientInfo[i].Msg[j].DeltaTime,
 					send.ClientInfo[i].Msg[j].Skillid}
+				c.Update(bson.M{"roomid": roomid}, bson.M{"$push": bson.M{str: roomFrames[i*FramesPerBag+j]}})
 			}
-		}
-		str := "room.roomframes"
-		for i := int32(0); i < RoomPeople*FramesPerBag; i++ {
-			c.Update(bson.M{"roomid": roomid}, bson.M{"$push": bson.M{str: roomFrames[i]}})
 		}
 	}
 }
