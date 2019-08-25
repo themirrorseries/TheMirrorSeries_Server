@@ -5,16 +5,17 @@ import (
 	"../proto/dto"
 	"github.com/golang/protobuf/proto"
 	//log "github.com/sirupsen/logrus"
+	"fmt"
 )
 
 type Fight struct {
 	data *HandlerData
 }
 
+//处理战斗过程中通信 包括移动（放技能）/场景加载完成
 func (fight *Fight) ReceiveMessage() {
 	switch fight.data.command {
 	case int32(DTO.FightTypes_MOVE_CREQ):
-		//client move
 		fight.move()
 		break
 	case int32(DTO.FightTypes_LIVEROOM_CREQ): //客户端离开
@@ -59,6 +60,7 @@ func (fight *Fight) winGame() {
 	//房间号  游戏信息
 }
 func (fight *Fight) loadUp() {
+	fmt.Println("client load ")
 	load := DTO.FightLoadDTO{}
 	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &load)
 	Global.RoomMng[load.Roomid].AddLoadPeople(load.Seat)

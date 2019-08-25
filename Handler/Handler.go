@@ -28,11 +28,13 @@ func NewHandlerData(decode *NetFrame.Decode, msg []byte, _client *Global.ClientS
 	return handlerData
 }
 
+//消息处理中心，处理和分发所有玩家的登录 匹配 战斗信息
 func Handler(msg []byte, client *Global.ClientState) {
 	var decode NetFrame.Decode
 	decode.Read(msg)
 	handlerData := NewHandlerData(&decode, msg, client)
 	var p HandlerFunc
+
 	//HANDLER CENTER
 	switch decode.Thetype {
 	case int32(DTO.MsgTypes_TYPE_LOGIN):
@@ -43,7 +45,6 @@ func Handler(msg []byte, client *Global.ClientState) {
 		break
 
 	case int32(DTO.MsgTypes_TYPE_USER):
-		//user
 		break
 	case int32(DTO.MsgTypes_TYPE_MATCH):
 		{

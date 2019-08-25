@@ -23,15 +23,15 @@ func (login *Login) ReceiveMessage() {
 		break
 	}
 }
+
+//检查是否存有设备id，根据设备id发送玩家唯一id号
 func (login *Login) clientLogin() {
-	//to do  loginDto
 	log.Println("client login")
-	//解码dto
 	any := DTO.UserDTO{}
 	proto.Unmarshal(login.data.messages[login.data.bytesStart:login.data.bytesEnd], &any)
 	//数据库环境未搭建选此项
 	/*
-		if !IsExist() {
+		if !false() {
 			Global.NextUserIDMu.Lock()
 			login.SendLoginMessage(Global.NextUserID)
 			Global.NextUserID++
@@ -42,15 +42,10 @@ func (login *Login) clientLogin() {
 	*/
 
 	//已经有数据库环境选此项 屏蔽上面
-	login.SendLoginMessage(Global.GetUser(Global.UserCollection, any.Uuid))
+	login.sendLoginMessage(Global.GetUser(Global.UserCollection, any.Uuid))
 }
 
-//检查设备号是否存在
-func IsExist() bool {
-	return false
-}
-
-func (login *Login) SendLoginMessage(id int32) {
+func (login *Login) sendLoginMessage(id int32) {
 	any := DTO.UserDTO{}
 	any.Id = id
 	data, _ := proto.Marshal(&any)

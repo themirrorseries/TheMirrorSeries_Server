@@ -27,6 +27,8 @@ func (match *Match) ReceiveMessage() {
 		break
 	}
 }
+
+//玩家申请匹配，将玩家加入匹配池中
 func (match *Match) matchStart() {
 	log.Println("match start")
 	match.data.client.IsMatch = true
@@ -37,6 +39,7 @@ func (match *Match) matchStart() {
 	Global.RoomCache.InsertPlayer(any.Id, any.RoleID, any.Name, match.data.client)
 }
 
+//玩家申请结束匹配，将玩家从匹配房间中去除
 func (match *Match) matchEnd() {
 
 	log.Println("match end")

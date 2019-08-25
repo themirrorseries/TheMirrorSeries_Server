@@ -11,16 +11,16 @@ func recvMessage(client net.Conn) error {
 	clientState := Global.NewClientState(client)
 	var message []byte
 	message = make([]byte, 1024)
-	//var err error=!nil
 
 	for {
 		len, err := client.Read(message)
 		if err != nil {
-			//客户端断开处理	匹配中 房间中
+			//客户端断开处理——匹配中
 			if clientState.IsMatch {
 				clientState.MatchOut()
 				Global.DetailedLog.Warn(clientState.PlayerID, Global.Client_OUT_Matching)
 			}
+			//客户端断开处理——在战斗中
 			if clientState.IsFight {
 				clientState.FightOut()
 				Global.DetailedLog.Warn(clientState.PlayerID, Global.Client_OUT_Fighting)
@@ -29,7 +29,6 @@ func recvMessage(client net.Conn) error {
 			break
 		}
 		if len > 0 {
-			//log.Println(string(message[0:len]))
 			Handler(message[0:len], clientState)
 		}
 	}
