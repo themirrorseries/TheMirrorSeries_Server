@@ -131,10 +131,10 @@ func (room *Room) roomInform() {
 	//match.X = Tools.RandFloat(-1, 1, 2)
 	//match.Z = Tools.RandFloat(-1, 1, 2)
 
-	match.Lights = make([]*DTO.Light, RoomPeople)
-	match.Players = make([]*DTO.Player, RoomPeople)
+	match.Lights = make([]*DTO.LightDTO, RoomPeople)
+	match.Players = make([]*DTO.PlayerDTO, RoomPeople)
 	for i := int32(0); i < RoomPeople; i++ {
-		match.Players[i] = new(DTO.Player)
+		match.Players[i] = new(DTO.PlayerDTO)
 		//DTO.Light为protobuf生成，有额外几个参数，不能直接初始化
 		match.Lights[i].Speed = 10
 		match.Lights[i].Count = 20

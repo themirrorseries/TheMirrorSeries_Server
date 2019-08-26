@@ -2,18 +2,18 @@ syntax = "proto3";
 message MatchSuccessDTO
 {
 		int32 roomid=1;
-		repeated Player players=2;
-		repeated Light lights=3;
+		repeated PlayerDTO players=2;
+		repeated LightDTO lights=3;
 }
 
-message Player{
+message PlayerDTO{
 	int32 playerid=1;
 	string name=2;
 	int32 roleid=3;
 	int32 seat=4;
 }
 
-message Light{
+message LightDTO{
     float speed = 1;
     float count = 2;
     float x = 3;
