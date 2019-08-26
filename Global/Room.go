@@ -21,27 +21,36 @@ type PlayerList struct {
 }
 
 type Room struct {
-	roomid         int32 //唯一id
-	playernum      int32 //人数
-	players        []PlayerList
-	cacheMsg       []DTO.ClientMoveDTO //缓存消息，达到RoomPeople数量或者达到最长等待时间后广播一次
-	cacheMsgIndex  int32
-	cacheMsgMu     sync.Mutex
-	RoomLivePeople int32 //房间存活人数
-	timer          *time.Timer
-	loadUp         []int32
-	loadUpNum      int32
-	loadUpMu       sync.Mutex
+	roomid           int32 //唯一id
+	playernum        int32 //人数
+	players          []PlayerList
+	cacheMsg         []DTO.ClientMoveDTO //缓存消息，达到RoomPeople数量或者达到最长等待时间后广播一次
+	cacheMsgIndex    int32
+	cacheMsgMu       sync.Mutex
+	RoomLivePeople   int32 //房间存活人数
+	timer            *time.Timer
+	loadUp           []int32
+	loadUpNum        int32
+	loadUpMu         sync.Mutex
+	tmpClientMoveDTO []DTO.ClientDTO
+	send             DTO.ServerMoveDTO
 }
 
 func NewRoom() *Room {
 	room := &Room{
-		roomid:         0,
-		playernum:      0,
-		players:        make([]PlayerList, RoomPeople),
-		cacheMsg:       make([]DTO.ClientMoveDTO, RoomPeople),
-		cacheMsgIndex:  0,
-		RoomLivePeople: RoomPeople,
+		roomid:           0,
+		playernum:        0,
+		players:          make([]PlayerList, RoomPeople),
+		cacheMsg:         make([]DTO.ClientMoveDTO, RoomPeople),
+		tmpClientMoveDTO: make([]DTO.ClientDTO, RoomPeople),
+		cacheMsgIndex:    0,
+		RoomLivePeople:   RoomPeople,
+		send:             DTO.ServerMoveDTO{},
+	}
+	room.send.ClientInfo = make([]*DTO.ClientDTO, RoomPeople)
+	for i := int32(0); i < RoomPeople; i++ {
+		room.send.ClientInfo[i] = &room.tmpClientMoveDTO[i]
+		room.send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, FramesPerBag)
 	}
 	return room
 }
@@ -167,28 +176,26 @@ func (room *Room) roomInform() {
 	//go AddFrame(RoomCollection, room.roomid, room.RoomChan)
 }
 
+//核心发送代码
 func (room *Room) RoomBroad() {
-	send := DTO.ServerMoveDTO{}
-	send.Bagid = room.cacheMsg[0].Bagid
-	//需要自己分配内存
-	TmpClientMoveDTO := make([]DTO.ClientDTO, RoomPeople)
-	send.ClientInfo = make([]*DTO.ClientDTO, RoomPeople)
-	num := int32(0)
+	//send := DTO.ServerMoveDTO{}
+	room.send.Bagid = room.cacheMsg[0].Bagid
+	//room.send.ClientInfo = make([]*DTO.ClientDTO, RoomPeople)
 	for i := int32(0); i < RoomPeople; i++ {
-		send.ClientInfo[i] = &TmpClientMoveDTO[i]
-		send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, FramesPerBag)
+		room.send.ClientInfo[i] = &room.tmpClientMoveDTO[i]
+		//room.send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, FramesPerBag)
 		if room.cacheMsg[i].Seat != -1 {
-			send.ClientInfo[i].Seat = room.cacheMsg[i].Seat
-			send.ClientInfo[i].Msg = room.cacheMsg[i].Msg
-			num++
+			room.send.ClientInfo[i].Seat = room.cacheMsg[i].Seat
+			room.send.ClientInfo[i].Msg = room.cacheMsg[i].Msg
 		} else {
-			send.ClientInfo[i].Seat = -1
-			break
+			room.send.ClientInfo[i].Seat = -1
+			room.send.ClientInfo[i].Msg = nil
+			//break
 		}
 	}
 
-	data, _ := proto.Marshal(&send)
-	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, send.XXX_Size())
+	data, _ := proto.Marshal(&room.send)
+	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, room.send.XXX_Size())
 	for i := int32(0); i < RoomPeople; i++ {
 		if !room.players[i].IsLeave {
 			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
@@ -262,4 +269,5 @@ func (room *Room) AddLoadPeople(seat int32) {
 			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
 		}
 	}
+	room.loadUpMu.Unlock()
 }
