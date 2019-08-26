@@ -2,11 +2,8 @@ syntax = "proto3";
 message MatchSuccessDTO
 {
 		int32 roomid=1;
-		float x=2;
-		float z=3;
-		float speed=4;
-		int32 count=5;
-		repeated Player players=6; 
+		repeated Player players=2;
+		repeated Light lights=3;
 }
 
 message Player{
@@ -14,4 +11,11 @@ message Player{
 	string name=2;
 	int32 roleid=3;
 	int32 seat=4;
+}
+
+message Light{
+    float speed = 1;
+    float count = 2;
+    float x = 3;
+    float z = 4;
 }

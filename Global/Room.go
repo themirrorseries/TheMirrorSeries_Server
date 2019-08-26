@@ -45,7 +45,7 @@ func NewRoom() *Room {
 	}
 	return room
 }
-func (room *Room) clear() {
+func (room *Room) Clear() {
 	room.roomid = 1
 	room.playernum = 0
 	for i := int32(0); i < RoomPeople; i++ {
@@ -85,7 +85,7 @@ func (room *Room) InsertPlayer(playerID int32, playerRole int32, playername stri
 		RoomMng[NextRoomID] = NewRoom()
 		RoomMng[NextRoomID].CopyRoom(&RoomCache)
 		NextRoomID++
-		RoomCache.clear()
+		RoomCache.Clear()
 		RoomMng[NextRoomID-1].roomInform()
 	} else { //如果没满，通知在匹配中，玩家可取消匹配
 		room.roomMatchInform(int32(DTO.MatchTypes_ENTER_SRES), client.Client)
@@ -126,14 +126,20 @@ func (room *Room) roomInform() {
 	match := DTO.MatchSuccessDTO{}
 	match.Roomid = room.roomid
 	// 暂时写死,后期读表
-	match.Speed = 10
-	match.Count = 20
-	match.X = Tools.RandFloat(-1, 1, 2)
-	match.Z = Tools.RandFloat(-1, 1, 2)
+	//match.Speed = 10
+	//match.Count = 20
+	//match.X = Tools.RandFloat(-1, 1, 2)
+	//match.Z = Tools.RandFloat(-1, 1, 2)
 
+	match.Lights = make([]*DTO.Light, RoomPeople)
 	match.Players = make([]*DTO.Player, RoomPeople)
 	for i := int32(0); i < RoomPeople; i++ {
 		match.Players[i] = new(DTO.Player)
+		//DTO.Light为protobuf生成，有额外几个参数，不能直接初始化
+		match.Lights[i].Speed = 10
+		match.Lights[i].Count = 20
+		match.Lights[i].X = Tools.RandFloat(-1, 1, 2)
+		match.Lights[i].Z = Tools.RandFloat(-1, 1, 2)
 	}
 
 	for i := int32(0); i < RoomPeople; i++ {
@@ -250,7 +256,7 @@ func (room *Room) AddLoadPeople(seat int32) {
 		log.Info("inform load ok")
 		send := DTO.AnyDTO{}
 		data, _ := proto.Marshal(&send)
-		buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, send.XXX_Size())
+		buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_LOAD_UP_SREQ), data, send.XXX_Size())
 		for i := int32(0); i < RoomPeople; i++ {
 			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
 		}
