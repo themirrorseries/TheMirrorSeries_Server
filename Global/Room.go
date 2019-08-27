@@ -122,7 +122,10 @@ func (room *Room) roomMatchInform(command int32, client net.Conn) {
 	any := DTO.MatchRtnDTO{}
 	any.Cacheroomid = 1
 	data, _ := proto.Marshal(&any)
-	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_MATCH), command, data, any.XXX_Size())
+	buffer, err := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_MATCH), command, data, any.XXX_Size())
+	if err != nil {
+		ErrorLog.Log.Errorln(err, "发送匹配通知消息编码出错！")
+	}
 	client.Write(buffer.Bytes())
 }
 
@@ -165,7 +168,10 @@ func (room *Room) roomInform() {
 		room.players[i].PlayerClient.RoomID = room.roomid
 	}
 	data, _ := proto.Marshal(&match)
-	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_MATCH), int32(DTO.MatchTypes_ENTER_SELECT_BRO), data, match.XXX_Size())
+	buffer, err := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_MATCH), int32(DTO.MatchTypes_ENTER_SELECT_BRO), data, match.XXX_Size())
+	if err != nil {
+		ErrorLog.Log.Errorln(err, "发送房间初始化消息编码出错！")
+	}
 	for i := int32(0); i < RoomPeople; i++ {
 		room.players[i].PlayerClient.Client.Write(buffer.Bytes())
 		DetailedLog.Detailed(room.players[i].PlayerID, Fight_IN)
@@ -176,29 +182,27 @@ func (room *Room) roomInform() {
 	if UseMongo {
 		AddRoom(RoomCollection, room.roomid, &match)
 	}
-	//go AddFrame(RoomCollection, room.roomid, room.RoomChan)
 }
 
 //核心发送代码
 func (room *Room) RoomBroad() {
-	//send := DTO.ServerMoveDTO{}
 	room.send.Bagid = room.cacheMsg[0].Bagid
-	//room.send.ClientInfo = make([]*DTO.ClientDTO, RoomPeople)
 	for i := int32(0); i < RoomPeople; i++ {
 		room.send.ClientInfo[i] = &room.tmpClientMoveDTO[i]
-		//room.send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, FramesPerBag)
 		if room.cacheMsg[i].Seat != -1 {
 			room.send.ClientInfo[i].Seat = room.cacheMsg[i].Seat
 			room.send.ClientInfo[i].Msg = room.cacheMsg[i].Msg
 		} else {
 			room.send.ClientInfo[i].Seat = -1
 			room.send.ClientInfo[i].Msg = nil
-			//break
 		}
 	}
 
 	data, _ := proto.Marshal(&room.send)
-	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, room.send.XXX_Size())
+	buffer, err := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, room.send.XXX_Size())
+	if err != nil {
+		ErrorLog.Log.Errorln(err, "发送战斗广播消息编码出错！")
+	}
 	for i := int32(0); i < RoomPeople; i++ {
 		if !room.players[i].IsLeave {
 			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
@@ -251,7 +255,6 @@ func (room *Room) PlayerLeave(seat int32) {
 	log.Println("leave")
 	room.playernum--
 	if room.playernum == 0 {
-		//close(room.RoomChan)
 		delete(RoomMng, room.roomid) //清除map，实际内存释放通过GC
 	}
 }
@@ -267,7 +270,10 @@ func (room *Room) AddLoadPeople(seat int32) {
 		log.Info("inform load ok")
 		send := DTO.AnyDTO{}
 		data, _ := proto.Marshal(&send)
-		buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_LOAD_UP_SREQ), data, send.XXX_Size())
+		buffer, err := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_LOAD_UP_SREQ), data, send.XXX_Size())
+		if err != nil {
+			ErrorLog.Log.Errorln(err, "发送加载通知消息编码出错！")
+		}
 		for i := int32(0); i < RoomPeople; i++ {
 			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
 		}

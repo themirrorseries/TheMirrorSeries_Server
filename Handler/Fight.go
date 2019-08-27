@@ -5,6 +5,7 @@ import (
 	"../proto/dto"
 	"github.com/golang/protobuf/proto"
 	//log "github.com/sirupsen/logrus"
+	"../NetFrame"
 	"fmt"
 )
 
@@ -44,16 +45,23 @@ func (fight *Fight) move() {
 
 func (fight *Fight) death() {
 	//房间号 Seat号
+	aesDec, err := NetFrame.AesDecrypt(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], NetFrame.MyKey)
+	if err != nil {
+		Global.ErrorLog.Log.Errorln(err, "客户端解码出错！")
+	}
 	death := DTO.FightLeaveDTO{}
-	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &death)
+	proto.Unmarshal(aesDec, &death)
 	Global.RoomMng[death.Roomid].PlayerDeath(death.Seat)
 }
 
 func (fight *Fight) leaveRoom() {
-	//房间号 Seat号
-	death := DTO.FightLeaveDTO{}
-	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &death)
-	Global.RoomMng[death.Roomid].PlayerLeave(death.Seat)
+	aesDec, err := NetFrame.AesDecrypt(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], NetFrame.MyKey)
+	if err != nil {
+		Global.ErrorLog.Log.Errorln(err, "客户端解码出错！")
+	}
+	leave := DTO.FightLeaveDTO{}
+	proto.Unmarshal(aesDec, &leave)
+	Global.RoomMng[leave.Roomid].PlayerLeave(leave.Seat)
 }
 
 func (fight *Fight) winGame() {
@@ -61,7 +69,12 @@ func (fight *Fight) winGame() {
 }
 func (fight *Fight) loadUp() {
 	fmt.Println("client load ")
+	aesDec, err := NetFrame.AesDecrypt(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], NetFrame.MyKey)
+	if err != nil {
+		Global.ErrorLog.Log.Errorln(err, "客户端解码出错！")
+	}
 	load := DTO.FightLoadDTO{}
-	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &load)
+	proto.Unmarshal(aesDec, &load)
 	Global.RoomMng[load.Roomid].AddLoadPeople(load.Seat)
+	fmt.Println(load.Seat)
 }

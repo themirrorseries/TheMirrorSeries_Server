@@ -2,6 +2,7 @@ package Handler
 
 import (
 	"../Global"
+	"../NetFrame"
 	"../proto/dto"
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
@@ -32,8 +33,13 @@ func (match *Match) ReceiveMessage() {
 func (match *Match) matchStart() {
 	log.Println("match start")
 	match.data.client.IsMatch = true
+	aesDec, err := NetFrame.AesDecrypt(match.data.messages[match.data.bytesStart:match.data.bytesEnd], NetFrame.MyKey)
+	if err != nil {
+		Global.ErrorLog.Log.Errorln(err, "客户端匹配解码出错！")
+	}
 	any := DTO.MatchDTO{}
-	proto.Unmarshal(match.data.messages[match.data.bytesStart:match.data.bytesEnd], &any)
+	proto.Unmarshal(aesDec, &any)
+
 	match.data.client.PlayerID = any.Id
 	Global.DetailedLog.Detailed(any.Id, Global.Match_IN)
 	Global.RoomCache.InsertPlayer(any.Id, any.RoleID, any.Name, match.data.client)
@@ -44,8 +50,12 @@ func (match *Match) matchEnd() {
 
 	log.Println("match end")
 	match.data.client.IsMatch = false
+	aesDec, err := NetFrame.AesDecrypt(match.data.messages[match.data.bytesStart:match.data.bytesEnd], NetFrame.MyKey)
+	if err != nil {
+		Global.ErrorLog.Log.Errorln(err, "客户端终止匹配解码出错！")
+	}
 	any := DTO.MatchRtnDTO{}
-	proto.Unmarshal(match.data.messages[match.data.bytesStart:match.data.bytesEnd], &any)
+	proto.Unmarshal(aesDec, &any)
 	Global.DetailedLog.Detailed(any.Id, Global.Match_OUT)
 	Global.RoomCache.RemovePlayer(any.Id, match.data.client.Client)
 }
