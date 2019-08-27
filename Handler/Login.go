@@ -4,6 +4,7 @@ import (
 	"../Global"
 	"../NetFrame"
 	"../proto/dto"
+	"fmt"
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
 )
@@ -27,13 +28,15 @@ func (login *Login) ReceiveMessage() {
 //检查是否存有设备id，根据设备id发送玩家唯一id号
 func (login *Login) clientLogin() {
 	log.Println("client login")
-	aesDec, err := NetFrame.AesDecrypt(login.data.messages[login.data.bytesStart:login.data.bytesEnd], NetFrame.MyKey)
-	if err != nil {
-		Global.ErrorLog.Log.Errorln(err, "客户端登录解码出错！")
-	}
+	//aesDec, err := NetFrame.AesDecrypt(login.data.messages[login.data.bytesStart:login.data.bytesEnd], NetFrame.MyKey)
+	aesDec := NetFrame.Decrypt(string(login.data.messages[login.data.bytesStart:login.data.bytesEnd]), string(NetFrame.MyKey))
+	//if err != nil {
+	//Global.ErrorLog.Log.Errorln(err, "客户端登录解码出错！")
+	//}
 	any := DTO.UserDTO{}
-	proto.Unmarshal(aesDec, &any)
+	proto.Unmarshal([]byte(aesDec), &any)
 
+	fmt.Println(any.Uuid)
 	if Global.UseMongo {
 		login.sendLoginMessage(Global.GetUser(Global.UserCollection, any.Uuid))
 	} else {
