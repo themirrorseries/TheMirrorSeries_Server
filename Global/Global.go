@@ -19,9 +19,10 @@ var RoomCollection *mgo.Collection
 var UserCollection *mgo.Collection
 var ClientMap map[net.Conn]ClientState
 
+const UseMongo bool = false
 const RoomPeople int32 = 2
 const FramesPerBag int32 = 3
-const WaitMS time.Duration = 30 //	新版20-丢包/不丢包1/10	10 1800 2800	旧版20——丢包/不丢包=1/200	15——1/20	10 1800 2800
+const WaitMS time.Duration = 30
 
 const MongoURL string = "localhost:27017"
 const DetailedLogPath string = "../Logs/detailed.log"

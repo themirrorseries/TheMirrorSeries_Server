@@ -26,10 +26,10 @@ func GetUser(c *mgo.Collection, uuid string) int32 {
 		c.Insert(&MongoDBUser{NextUserID, uuid})
 		NextUserID++
 		NextUserIDMu.Unlock()
-		DetailedLog.Log.Info("该设备第一次连接，将为设备分配唯一用户ID---...", ret)
+		DetailedLog.Log.Info("该设备第一次连接，将为设备分配唯一用户ID---", ret, "...")
 		return ret
 	} else {
-		DetailedLog.Log.Info("已查询到该设备用户ID---...", user.Playerid)
+		DetailedLog.Log.Info("已查询到该设备用户ID---", user.Playerid, "...")
 		return user.Playerid
 	}
 }

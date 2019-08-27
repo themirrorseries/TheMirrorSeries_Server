@@ -30,19 +30,15 @@ func (login *Login) clientLogin() {
 	any := DTO.UserDTO{}
 	proto.Unmarshal(login.data.messages[login.data.bytesStart:login.data.bytesEnd], &any)
 	//数据库环境未搭建选此项
-	/*
-		if !false() {
-			Global.NextUserIDMu.Lock()
-			login.SendLoginMessage(Global.NextUserID)
-			Global.NextUserID++
-			Global.NextUserIDMu.Unlock()
-		} else {
-			login.SendLoginMessage(Global.NextUserID)
-		}
-	*/
 
-	//已经有数据库环境选此项 屏蔽上面
-	login.sendLoginMessage(Global.GetUser(Global.UserCollection, any.Uuid))
+	if Global.UseMongo {
+		login.sendLoginMessage(Global.GetUser(Global.UserCollection, any.Uuid))
+	} else {
+		Global.NextUserIDMu.Lock()
+		login.sendLoginMessage(Global.NextUserID)
+		Global.NextUserID++
+		Global.NextUserIDMu.Unlock()
+	}
 }
 
 func (login *Login) sendLoginMessage(id int32) {

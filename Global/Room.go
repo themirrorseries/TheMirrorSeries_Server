@@ -4,6 +4,7 @@ import (
 	"../NetFrame"
 	"../Tools"
 	"../proto/dto"
+	"fmt"
 	"github.com/golang/protobuf/proto"
 	log "github.com/sirupsen/logrus"
 	"net"
@@ -157,6 +158,7 @@ func (room *Room) roomInform() {
 		match.Players[i].Name = room.players[i].Name
 		match.Players[i].Roleid = room.players[i].PlayerRole
 		match.Players[i].Seat = i + 1
+		fmt.Println(match.Players[i].Seat)
 		room.players[i].PlayerClient.IsMatch = false
 		room.players[i].PlayerClient.IsFight = true
 		room.players[i].PlayerClient.RoomSeat = i + 1
@@ -170,9 +172,10 @@ func (room *Room) roomInform() {
 	}
 	log.Println("inform ok")
 
-	//room.RoomChan = make(chan *DTO.ServerMoveDTO, 100000)
 	//把新开的房间信息存入数据库
-	AddRoom(RoomCollection, room.roomid, &match)
+	if UseMongo {
+		AddRoom(RoomCollection, room.roomid, &match)
+	}
 	//go AddFrame(RoomCollection, room.roomid, room.RoomChan)
 }
 
