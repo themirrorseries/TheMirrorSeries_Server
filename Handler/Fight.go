@@ -18,16 +18,17 @@ func (fight *Fight) ReceiveMessage() {
 	case int32(DTO.FightTypes_MOVE_CREQ):
 		fight.move()
 		break
-	case int32(DTO.FightTypes_LIVEROOM_CREQ): //客户端离开
-		fight.leaveRoom()
-		break
 	case int32(DTO.FightTypes_DEATH_CREQ): //客户端死亡
 		fight.death()
 		break
-	case int32(DTO.FightTypes_WIN_CREQ): //客户端胜利
+	case int32(DTO.FightTypes_GAME_OVER_CREQ): //游戏结束
+		fight.gameOver()
 		break
 	case int32(DTO.FightTypes_LOAD_UP_CREQ):
 		fight.loadUp()
+		break
+	case int32(DTO.FightTypes_LAEVE_CREQ):
+		fight.leaveRoom()
 		break
 	default:
 		break
@@ -38,30 +39,28 @@ func (fight *Fight) move() {
 
 	move := DTO.ClientMoveDTO{}
 	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &move)
-
 	Global.RoomMng[move.Roomid].InsertMsg(&move)
 }
 
 func (fight *Fight) death() {
-	//房间号 Seat号
 	death := DTO.FightLeaveDTO{}
 	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &death)
 	Global.RoomMng[death.Roomid].PlayerDeath(death.Seat)
 }
 
-func (fight *Fight) leaveRoom() {
-	//房间号 Seat号
-	death := DTO.FightLeaveDTO{}
-	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &death)
-	Global.RoomMng[death.Roomid].PlayerLeave(death.Seat)
-}
-
-func (fight *Fight) winGame() {
-	//房间号  游戏信息
+func (fight *Fight) gameOver() {
+	gameOver := DTO.FightLeaveDTO{}
+	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &gameOver)
+	Global.RoomMng[gameOver.Roomid].GameOver(gameOver.Seat)
 }
 func (fight *Fight) loadUp() {
-	fmt.Println("client load ")
 	load := DTO.FightLoadDTO{}
 	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &load)
 	Global.RoomMng[load.Roomid].AddLoadPeople(load.Seat)
+}
+
+func (fight *Fight) leaveRoom() {
+	leave := DTO.FightLoadDTO{}
+	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &leave)
+	Global.RoomMng[leave.Roomid].PlayerLeave(leave.Seat)
 }

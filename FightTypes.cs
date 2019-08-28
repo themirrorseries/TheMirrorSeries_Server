@@ -22,10 +22,11 @@ public static partial class FightTypesReflection {
   static FightTypesReflection() {
     byte[] descriptorData = global::System.Convert.FromBase64String(
         string.Concat(
-          "ChRwcm90by9GaWdodFR5cGVzLnR4dCqRAQoKRmlnaHRUeXBlcxINCglNT1ZF",
-          "X0NSRVEQABIOCgpTS0lMTF9DUkVREAESEAoMTE9BRF9VUF9DUkVREAISEAoM",
-          "TE9BRF9VUF9TUkVREAMSDwoLSU5GT1JNX1NSRVMQBBIRCg1MSVZFUk9PTV9D",
-          "UkVREAUSDgoKREVBVEhfQ1JFURAGEgwKCFdJTl9DUkVREAdiBnByb3RvMw=="));
+          "ChRwcm90by9GaWdodFR5cGVzLnR4dCq4AQoKRmlnaHRUeXBlcxINCglNT1ZF",
+          "X0NSRVEQABIPCgtJTkZPUk1fU1JFUxABEhAKDExPQURfVVBfQ1JFURACEhAK",
+          "DExPQURfVVBfU1JFUxADEg4KCkRFQVRIX0NSRVEQBBIOCgpERUFUSF9TUkVT",
+          "EAUSEgoOR0FNRV9PVkVSX0NSRVEQBhISCg5HQU1FX09WRVJfU1JFUxAHEg4K",
+          "CkxBRVZFX0NSRVEQCBIOCgpMQUVWRV9TUkVTEAliBnByb3RvMw=="));
     descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
         new pbr::FileDescriptor[] { },
         new pbr::GeneratedClrTypeInfo(new[] {typeof(global::FightTypes), }, null, null));
@@ -36,13 +37,15 @@ public static partial class FightTypesReflection {
 #region Enums
 public enum FightTypes {
   [pbr::OriginalName("MOVE_CREQ")] MoveCreq = 0,
-  [pbr::OriginalName("SKILL_CREQ")] SkillCreq = 1,
+  [pbr::OriginalName("INFORM_SRES")] InformSres = 1,
   [pbr::OriginalName("LOAD_UP_CREQ")] LoadUpCreq = 2,
-  [pbr::OriginalName("LOAD_UP_SREQ")] LoadUpSreq = 3,
-  [pbr::OriginalName("INFORM_SRES")] InformSres = 4,
-  [pbr::OriginalName("LIVEROOM_CREQ")] LiveroomCreq = 5,
-  [pbr::OriginalName("DEATH_CREQ")] DeathCreq = 6,
-  [pbr::OriginalName("WIN_CREQ")] WinCreq = 7,
+  [pbr::OriginalName("LOAD_UP_SRES")] LoadUpSres = 3,
+  [pbr::OriginalName("DEATH_CREQ")] DeathCreq = 4,
+  [pbr::OriginalName("DEATH_SRES")] DeathSres = 5,
+  [pbr::OriginalName("GAME_OVER_CREQ")] GameOverCreq = 6,
+  [pbr::OriginalName("GAME_OVER_SRES")] GameOverSres = 7,
+  [pbr::OriginalName("LAEVE_CREQ")] LaeveCreq = 8,
+  [pbr::OriginalName("LAEVE_SRES")] LaeveSres = 9,
 }
 
 #endregion
