@@ -56,6 +56,7 @@ func NewRoom() *Room {
 	for i := int32(0); i < RoomPeople; i++ {
 		room.send.ClientInfo[i] = &room.tmpClientMoveDTO[i]
 		room.send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, FramesPerBag)
+		room.cacheMsg[i].Msg = make([]*DTO.FrameInfo, FramesPerBag)
 	}
 	return room
 }
@@ -183,6 +184,45 @@ func (room *Room) roomInform() {
 	//go AddFrame(RoomCollection, room.roomid, room.RoomChan)
 }
 
+/*
+func (room *Room) RoomBroad() {
+	if room.gameOver {
+		return
+	}
+	send := DTO.ServerMoveDTO{}
+	send.Bagid = room.cacheMsg[0].Bagid
+	send.ClientInfo = make([]*DTO.ClientDTO, RoomPeople)
+	tmp := make([]DTO.ClientDTO, RoomPeople)
+	for i := int32(0); i < RoomPeople; i++ {
+		send.ClientInfo[i] = &tmp[i]
+		send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, FramesPerBag)
+		if i >= room.RoomLivePeople {
+			room.send.ClientInfo[i] = nil
+			continue
+		}
+		if room.cacheMsg[i].Seat != -1 {
+			//send.ClientInfo[i] = &tmp[i]
+			send.ClientInfo[i].Seat = room.cacheMsg[i].Seat
+			send.ClientInfo[i].Msg = room.cacheMsg[i].Msg
+		} else {
+			//send.ClientInfo[i] = nil
+			send.ClientInfo[i].Seat = -1
+			//room.send.ClientInfo[i].Msg = nil
+			break
+		}
+	}
+
+	data, _ := proto.Marshal(&send)
+	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, send.XXX_Size())
+	for i := int32(0); i < RoomPeople; i++ {
+		if !room.players[i].IsLeave {
+			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
+		}
+	}
+	room.ClearCacheMsg()
+}
+*/
+
 //核心发送代码
 func (room *Room) RoomBroad() {
 	if room.gameOver {
@@ -191,14 +231,24 @@ func (room *Room) RoomBroad() {
 	room.send.Bagid = room.cacheMsg[0].Bagid
 	//room.send.ClientInfo = make([]*DTO.ClientDTO, RoomPeople)
 	for i := int32(0); i < RoomPeople; i++ {
-		room.send.ClientInfo[i] = &room.tmpClientMoveDTO[i]
+		//room.send.ClientInfo[i] = &room.tmpClientMoveDTO[i]
 		//room.send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, FramesPerBag)
+		if i >= room.RoomLivePeople {
+			//room.send.ClientInfo[i].Seat = -1
+			room.send.ClientInfo[i] = nil
+			continue
+		}
 		if room.cacheMsg[i].Seat != -1 {
+			room.send.ClientInfo[i] = &room.tmpClientMoveDTO[i]
 			room.send.ClientInfo[i].Seat = room.cacheMsg[i].Seat
-			room.send.ClientInfo[i].Msg = room.cacheMsg[i].Msg
+			//room.send.ClientInfo[i].Msg = room.cacheMsg[i].Msg
+			for j := int32(0); j < FramesPerBag; j++ {
+				room.send.ClientInfo[i].Msg[j] = room.cacheMsg[i].Msg[j]
+			}
 		} else {
-			room.send.ClientInfo[i].Seat = -1
-			room.send.ClientInfo[i].Msg = nil
+			//room.send.ClientInfo[i].Seat = -1
+			room.send.ClientInfo[i] = nil
+			//room.send.ClientInfo[i].Msg = nil
 			//break
 		}
 	}
@@ -206,6 +256,7 @@ func (room *Room) RoomBroad() {
 	data, _ := proto.Marshal(&room.send)
 	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, room.send.XXX_Size())
 	for i := int32(0); i < RoomPeople; i++ {
+		//if !room.players[i].IsLeave && !room.players[i].IsDead {
 		if !room.players[i].IsLeave {
 			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
 		}
@@ -224,15 +275,21 @@ func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
 		go func() {
 			select {
 			case <-room.timer.C:
+				room.timer.Stop()
 				room.RoomBroad()
 			}
 		}()
 	}
 	room.cacheMsg[room.cacheMsgIndex] = *move
+	for i := int32(0); i < FramesPerBag; i++ {
+		room.cacheMsg[room.cacheMsgIndex].Msg[i] = (*move).Msg[i]
+	}
 	room.cacheMsgIndex++
 
 	if room.cacheMsgIndex == room.RoomLivePeople {
 		room.timer.Stop()
+		//fmt.Println(room.cacheMsgIndex)
+		log.Println(room.cacheMsgIndex)
 		room.RoomBroad()
 	}
 	room.cacheMsgMu.Unlock()
@@ -241,6 +298,7 @@ func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
 func (room *Room) ClearCacheMsg() {
 	for i := int32(0); i < RoomPeople; i++ {
 		room.cacheMsg[i].Seat = -1
+		room.send.ClientInfo[i] = nil
 	}
 	room.cacheMsgIndex = 0
 }
@@ -255,6 +313,7 @@ func (room *Room) PlayerDeath(seat int32) {
 	data, _ := proto.Marshal(&send)
 	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_DEATH_SRES), data, send.XXX_Size())
 	room.players[seat-1].PlayerClient.Client.Write(buffer.Bytes())
+	fmt.Println("发送死亡ok")
 }
 
 //
@@ -285,7 +344,7 @@ func (room *Room) PlayerLeave(seat int32) {
 	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_LAEVE_SRES), data, send.XXX_Size())
 	room.players[seat-1].PlayerClient.Client.Write(buffer.Bytes())
 	if room.playerNum == 0 {
-		delete(RoomMng, room.roomid) //清除map，实际内存释放通过GC
+		delete(RoomMng, room.roomid)
 	}
 }
 

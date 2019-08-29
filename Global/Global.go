@@ -20,7 +20,7 @@ var UserCollection *mgo.Collection
 var ClientMap map[net.Conn]ClientState
 
 const UseMongo bool = false
-const RoomPeople int32 = 2
+const RoomPeople int32 = 3
 const FramesPerBag int32 = 3
 const WaitMS time.Duration = 30
 
