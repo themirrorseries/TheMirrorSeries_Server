@@ -26,7 +26,7 @@ func (login *Login) ReceiveMessage() {
 
 //检查是否存有设备id，根据设备id发送玩家唯一id号
 func (login *Login) clientLogin() {
-	log.Println("client login")
+	//log.Println("client login")
 	any := DTO.UserDTO{}
 	proto.Unmarshal(login.data.messages[login.data.bytesStart:login.data.bytesEnd], &any)
 	//数据库环境未搭建选此项

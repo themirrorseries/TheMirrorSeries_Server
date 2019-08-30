@@ -25,7 +25,7 @@ func recvMessage(client net.Conn) error {
 				clientState.FightOut()
 				Global.DetailedLog.Warn(clientState.PlayerID, Global.Client_OUT_Fighting)
 			}
-			log.Error("client out", client.Close())
+			//log.Error("client out", client.Close())
 			break
 		}
 		if len > 0 {
@@ -51,7 +51,7 @@ func Start() {
 			continue
 		}
 
-		log.Println("the client is connectted...")
+		//log.Println("the client is connectted...")
 		Global.DetailedLog.Log.Info("一个新的客户端连接...")
 		go recvMessage(client)
 	}

@@ -30,7 +30,7 @@ func (match *Match) ReceiveMessage() {
 
 //玩家申请匹配，将玩家加入匹配池中
 func (match *Match) matchStart() {
-	log.Println("match start")
+	//log.Println("match start")
 	match.data.client.IsMatch = true
 	any := DTO.MatchDTO{}
 	proto.Unmarshal(match.data.messages[match.data.bytesStart:match.data.bytesEnd], &any)
@@ -42,7 +42,7 @@ func (match *Match) matchStart() {
 //玩家申请结束匹配，将玩家从匹配房间中去除
 func (match *Match) matchEnd() {
 
-	log.Println("match end")
+	//log.Println("match end")
 	match.data.client.IsMatch = false
 	any := DTO.MatchRtnDTO{}
 	proto.Unmarshal(match.data.messages[match.data.bytesStart:match.data.bytesEnd], &any)

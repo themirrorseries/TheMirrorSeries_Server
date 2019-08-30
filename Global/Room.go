@@ -6,7 +6,8 @@ import (
 	"../proto/dto"
 	"fmt"
 	"github.com/golang/protobuf/proto"
-	log "github.com/sirupsen/logrus"
+	//log "github.com/sirupsen/logrus"
+	"log"
 	"net"
 	"sync"
 	"time"
@@ -175,7 +176,7 @@ func (room *Room) roomInform() {
 		room.players[i].PlayerClient.Client.Write(buffer.Bytes())
 		DetailedLog.Detailed(room.players[i].PlayerID, Fight_IN)
 	}
-	log.Println("inform ok")
+	//log.Println("inform ok")
 
 	//把新开的房间信息存入数据库
 	if UseMongo {
@@ -286,10 +287,10 @@ func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
 	}
 	room.cacheMsgIndex++
 
-	if room.cacheMsgIndex == room.RoomLivePeople {
+	if room.cacheMsgIndex >= room.RoomLivePeople {
 		room.timer.Stop()
 		//fmt.Println(room.cacheMsgIndex)
-		log.Println(room.cacheMsgIndex)
+		//log.Println(room.cacheMsgIndex)
 		room.RoomBroad()
 	}
 	room.cacheMsgMu.Unlock()
@@ -313,7 +314,7 @@ func (room *Room) PlayerDeath(seat int32) {
 	data, _ := proto.Marshal(&send)
 	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_DEATH_SRES), data, send.XXX_Size())
 	room.players[seat-1].PlayerClient.Client.Write(buffer.Bytes())
-	fmt.Println("发送死亡ok")
+	//fmt.Println("发送死亡ok")
 }
 
 //
@@ -334,7 +335,7 @@ func (room *Room) PlayerLeave(seat int32) {
 		room.RoomLivePeople--
 		room.RoomLivePeopleMu.Unlock()
 	}
-	log.Println(seat, "leave")
+	//log.Println(seat, "leave")
 	room.playerNumMu.Lock()
 	room.playerNum--
 	room.playerNumMu.Unlock()
@@ -344,7 +345,7 @@ func (room *Room) PlayerLeave(seat int32) {
 	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_LAEVE_SRES), data, send.XXX_Size())
 	room.players[seat-1].PlayerClient.Client.Write(buffer.Bytes())
 	if room.playerNum == 0 {
-		delete(RoomMng, room.roomid)
+		//delete(RoomMng, room.roomid)
 	}
 }
 
@@ -354,9 +355,9 @@ func (room *Room) AddLoadPeople(seat int32) {
 		room.loadUp[seat-1] = 1
 		room.loadUpNum++
 	}
-	log.Info("load ok")
+	//log.Info("load ok")
 	if room.loadUpNum == RoomPeople {
-		log.Info("inform load ok")
+		//	log.Info("inform load ok")
 		send := DTO.AnyDTO{}
 		data, _ := proto.Marshal(&send)
 		buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_LOAD_UP_SRES), data, send.XXX_Size())
