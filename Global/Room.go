@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	//log "github.com/sirupsen/logrus"
-	"log"
 	"net"
 	"sync"
 	"time"
@@ -305,10 +304,12 @@ func (room *Room) ClearCacheMsg() {
 }
 
 func (room *Room) PlayerDeath(seat int32) {
-	room.players[seat-1].IsDead = true
-	room.RoomLivePeopleMu.Lock()
-	room.RoomLivePeople--
-	room.RoomLivePeopleMu.Unlock()
+	if room.players[seat-1].IsDead {
+		room.players[seat-1].IsDead = true
+		room.RoomLivePeopleMu.Lock()
+		room.RoomLivePeople--
+		room.RoomLivePeopleMu.Unlock()
+	}
 
 	send := DTO.AnyDTO{}
 	data, _ := proto.Marshal(&send)

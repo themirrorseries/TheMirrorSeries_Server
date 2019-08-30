@@ -52,7 +52,7 @@ func (fight *Fight) death() {
 func (fight *Fight) gameOver() {
 	gameOver := DTO.FightLeaveDTO{}
 	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &gameOver)
-	fmt.Println("游戏结束", gameOver.Seat)
+	//fmt.Println("游戏结束", gameOver.Seat)
 	Global.RoomMng[gameOver.Roomid].GameOver(gameOver.Seat)
 }
 func (fight *Fight) loadUp() {
@@ -64,6 +64,6 @@ func (fight *Fight) loadUp() {
 func (fight *Fight) leaveRoom() {
 	leave := DTO.FightLoadDTO{}
 	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &leave)
-	fmt.Println("离开", leave.Seat)
+	//fmt.Println("离开", leave.Seat)
 	Global.RoomMng[leave.Roomid].PlayerLeave(leave.Seat)
 }
