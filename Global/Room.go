@@ -2,11 +2,11 @@ package Global
 
 import (
 	"../NetFrame"
-	"../Tools"
 	"../proto/dto"
 	"fmt"
 	"github.com/golang/protobuf/proto"
 	//log "github.com/sirupsen/logrus"
+	"math/rand"
 	"net"
 	"sync"
 	"time"
@@ -150,12 +150,14 @@ func (room *Room) roomInform() {
 	match.Speed = 10
 	match.Lights = make([]*DTO.LightDTO, RoomPeople)
 	match.Players = make([]*DTO.PlayerDTO, RoomPeople)
+	rand.Seed(int64(time.Now().UnixNano()))
 	for i := int32(0); i < RoomPeople; i++ {
 		match.Players[i] = new(DTO.PlayerDTO)
 		//DTO.Light为protobuf生成，有额外几个参数，不能直接初始化
 		match.Lights[i] = new(DTO.LightDTO)
-		match.Lights[i].X = Tools.RandFloat(-1, 1, 2)
-		match.Lights[i].Z = Tools.RandFloat(-1, 1, 2)
+		match.Lights[i].X = rand.Float32()*2 - 1 //rand.Float32产生0-1随机数
+		match.Lights[i].Z = rand.Float32()*2 - 1
+		//fmt.Println(match.Lights[i].X, "     ", match.Lights[i].Z)
 	}
 
 	for i := int32(0); i < RoomPeople; i++ {
