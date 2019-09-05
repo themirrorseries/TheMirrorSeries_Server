@@ -5,7 +5,7 @@ import (
 	"../proto/dto"
 	"github.com/golang/protobuf/proto"
 	//log "github.com/sirupsen/logrus"
-	"fmt"
+	//"fmt"
 )
 
 type Fight struct {
@@ -39,13 +39,17 @@ func (fight *Fight) move() {
 
 	move := DTO.ClientMoveDTO{}
 	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &move)
-	Global.RoomMng[move.Roomid].InsertMsg(&move)
+	//if Global.RoomMng[move.Roomid]
+	_, ok := Global.RoomMng[move.Roomid]
+	if ok {
+		Global.RoomMng[move.Roomid].InsertMsg(&move)
+	}
 }
 
 func (fight *Fight) death() {
 	death := DTO.FightLeaveDTO{}
 	proto.Unmarshal(fight.data.messages[fight.data.bytesStart:fight.data.bytesEnd], &death)
-	fmt.Println("死亡", death.Seat)
+	//fmt.Println("死亡", death.Seat)
 	Global.RoomMng[death.Roomid].PlayerDeath(death.Seat)
 }
 

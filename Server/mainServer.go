@@ -4,6 +4,8 @@ import (
 	"../Global"
 	"../Handler"
 	"github.com/sirupsen/logrus"
+	//"net/http"
+	//_ "net/http/pprof"
 )
 
 func main() {
@@ -25,5 +27,8 @@ func main() {
 	//初始化日志信息
 	Global.DetailedLog.Log = Global.InitLog(logrus.InfoLevel, Global.DetailedLogPath)
 	Global.ErrorLog.Log = Global.InitLog(logrus.ErrorLevel, Global.ErrorLogPath)
+	//go func() {
+	//	http.ListenAndServe(":6060", nil)
+	//}()
 	Handler.Start()
 }

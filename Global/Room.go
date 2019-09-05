@@ -3,7 +3,7 @@ package Global
 import (
 	"../NetFrame"
 	"../proto/dto"
-	"fmt"
+	//"fmt"
 	"github.com/golang/protobuf/proto"
 	//log "github.com/sirupsen/logrus"
 	"math/rand"
@@ -61,7 +61,7 @@ func NewRoom() *Room {
 	return room
 }
 func (room *Room) Clear() {
-	room.roomid = 1
+	room.roomid = -1
 	room.playerNum = 0
 	for i := int32(0); i < RoomPeople; i++ {
 		room.players[i].PlayerID = -1
@@ -78,7 +78,7 @@ func (room *Room) CopyRoom(cacheRoom *Room) {
 }
 
 //玩家申请匹配时 将玩家加入匹配池
-func (room *Room) InsertPlayer(playerID int32, playerRole int32, playername string, client *ClientState) {
+func (room *Room) InsertPlayer(playerID int32, playerRole int32, playerName string, client *ClientState) {
 	RoomCacheMu.Lock()
 	if room.playerNum < RoomPeople {
 		for i := int32(0); i < RoomPeople; i++ {
@@ -86,7 +86,7 @@ func (room *Room) InsertPlayer(playerID int32, playerRole int32, playername stri
 				room.players[i].PlayerID = playerID
 				room.players[i].PlayerRole = playerRole
 				room.players[i].PlayerClient = client
-				room.players[i].Name = playername
+				room.players[i].Name = playerName
 				room.players[i].IsLeave = false
 				room.players[i].IsDead = false
 				room.playerNum++
@@ -147,7 +147,7 @@ func (room *Room) roomInform() {
 	//match.Z = Tools.RandFloat(-1, 1, 2)
 
 	match.Count = 20
-	match.Speed = 10
+	match.Speed = 20
 	match.Lights = make([]*DTO.LightDTO, RoomPeople)
 	match.Players = make([]*DTO.PlayerDTO, RoomPeople)
 	rand.Seed(int64(time.Now().UnixNano()))
@@ -165,7 +165,7 @@ func (room *Room) roomInform() {
 		match.Players[i].Name = room.players[i].Name
 		match.Players[i].Roleid = room.players[i].PlayerRole
 		match.Players[i].Seat = i + 1
-		fmt.Println(match.Players[i].Seat)
+		//fmt.Println(match.Players[i].Seat)
 		room.players[i].PlayerClient.IsMatch = false
 		room.players[i].PlayerClient.IsFight = true
 		room.players[i].PlayerClient.RoomSeat = i + 1
@@ -185,45 +185,6 @@ func (room *Room) roomInform() {
 	}
 	//go AddFrame(RoomCollection, room.roomid, room.RoomChan)
 }
-
-/*
-func (room *Room) RoomBroad() {
-	if room.gameOver {
-		return
-	}
-	send := DTO.ServerMoveDTO{}
-	send.Bagid = room.cacheMsg[0].Bagid
-	send.ClientInfo = make([]*DTO.ClientDTO, RoomPeople)
-	tmp := make([]DTO.ClientDTO, RoomPeople)
-	for i := int32(0); i < RoomPeople; i++ {
-		send.ClientInfo[i] = &tmp[i]
-		send.ClientInfo[i].Msg = make([]*DTO.FrameInfo, FramesPerBag)
-		if i >= room.RoomLivePeople {
-			room.send.ClientInfo[i] = nil
-			continue
-		}
-		if room.cacheMsg[i].Seat != -1 {
-			//send.ClientInfo[i] = &tmp[i]
-			send.ClientInfo[i].Seat = room.cacheMsg[i].Seat
-			send.ClientInfo[i].Msg = room.cacheMsg[i].Msg
-		} else {
-			//send.ClientInfo[i] = nil
-			send.ClientInfo[i].Seat = -1
-			//room.send.ClientInfo[i].Msg = nil
-			break
-		}
-	}
-
-	data, _ := proto.Marshal(&send)
-	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, send.XXX_Size())
-	for i := int32(0); i < RoomPeople; i++ {
-		if !room.players[i].IsLeave {
-			room.players[i].PlayerClient.Client.Write(buffer.Bytes())
-		}
-	}
-	room.ClearCacheMsg()
-}
-*/
 
 //核心发送代码
 func (room *Room) RoomBroad() {
@@ -257,6 +218,7 @@ func (room *Room) RoomBroad() {
 
 	data, _ := proto.Marshal(&room.send)
 	buffer := NetFrame.WriteMessage(int32(DTO.MsgTypes_TYPE_FIGHT), int32(DTO.FightTypes_INFORM_SRES), data, room.send.XXX_Size())
+	//fmt.Println("广播体size：", room.send.XXX_Size()+8)
 	for i := int32(0); i < RoomPeople; i++ {
 		//if !room.players[i].IsLeave && !room.players[i].IsDead {
 		if !room.players[i].IsLeave {
@@ -287,7 +249,7 @@ func (room *Room) InsertMsg(move *DTO.ClientMoveDTO) {
 		room.cacheMsg[room.cacheMsgIndex].Msg[i] = (*move).Msg[i]
 	}
 	room.cacheMsgIndex++
-
+	//fmt.Println("收到包大小:", move.XXX_Size())
 	if room.cacheMsgIndex >= room.RoomLivePeople {
 		room.timer.Stop()
 		//fmt.Println(room.cacheMsgIndex)

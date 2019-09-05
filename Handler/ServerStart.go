@@ -2,6 +2,9 @@ package Handler
 
 import (
 	"../Global"
+	//"bytes"
+	//"encoding/binary"
+	//"fmt"
 	log "github.com/sirupsen/logrus"
 	"net"
 	"os"
@@ -28,7 +31,25 @@ func recvMessage(client net.Conn) error {
 			//log.Error("client out", client.Close())
 			break
 		}
+		/*
+			readPos := int32(0)
+			var msglen int32
+			for {
+				if len > 0 {
+					binary.Read(bytes.NewBuffer(message[readPos:]), binary.LittleEndian, &msglen)
+					msglen += 4
+					if len > int(msglen) {
+						fmt.Println("发生粘包：", len, msglen)
+					}
+					Handler(message[readPos:readPos+msglen], clientState)
+					readPos += msglen
+					len -= int(msglen)
+				} else {
+					break
+				}
+			}*/
 		if len > 0 {
+			//Handler(message[readPos:readPos+msglen], clientState)
 			Handler(message[0:len], clientState)
 		}
 	}
