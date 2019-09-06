@@ -146,7 +146,7 @@ func (room *Room) roomInform() {
 	//match.X = Tools.RandFloat(-1, 1, 2)
 	//match.Z = Tools.RandFloat(-1, 1, 2)
 
-	match.Count = 20
+	match.Count = 10
 	match.Speed = 20
 	match.Lights = make([]*DTO.LightDTO, RoomPeople)
 	match.Players = make([]*DTO.PlayerDTO, RoomPeople)
